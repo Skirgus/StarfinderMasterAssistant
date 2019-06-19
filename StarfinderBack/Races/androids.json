@@ -1,0 +1,13 @@
+{
+    "id": "androids",
+    "name": "Андроиды",
+    "modifiers":{
+        "Strength": 2,
+        "Dexterity": 0,
+        "Constitution": 0,
+        "Intelligence": 2,
+        "Wisdom": 0,
+        "Charisma": -2
+    },
+    "additionalHP": 4
+}
