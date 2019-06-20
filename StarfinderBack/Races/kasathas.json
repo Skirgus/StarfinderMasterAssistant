@@ -1,0 +1,13 @@
+{
+    "id": "kasathas",
+    "name": "Касаты",
+    "modifiers":{
+        "Strength": 2,
+        "Dexterity": 0,
+        "Constitution": 0,
+        "Intelligence": -2,
+        "Wisdom": 2,
+        "Charisma": 0
+    },
+    "additionalHP": 4
+}
