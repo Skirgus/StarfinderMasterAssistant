@@ -9,8 +9,10 @@ from rest_framework import viewsets
 from django.http import JsonResponse
 from django.core import serializers
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer
+
 # Create your views here.
 
 class RacesView(APIView):
