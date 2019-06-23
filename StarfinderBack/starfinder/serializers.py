@@ -9,6 +9,8 @@ class RaceSerializer(serializers.Serializer):
     age_of_majority = serializers.IntegerField()
     basic_info = serializers.CharField()
     title_info = serializers.CharField()
+    basic_image = serializers.ImageField()
+    title_image = serializers.ImageField()
 
 
 class RaceDescriptionSerializer(serializers.Serializer):

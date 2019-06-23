@@ -10,6 +10,8 @@ class Race(models.Model):
     age_of_majority = models.IntegerField()
     basic_info = models.TextField()
     title_info = models.TextField()
+    basic_image = models.ImageField(upload_to='races/', null=True, blank=True)
+    title_image = models.ImageField(upload_to='races/', null=True, blank=True)
     
     def __str__(self):
         return self.name
