@@ -23,7 +23,7 @@ class RaceDescription(models.Model):
     race = models.ForeignKey('Race',  related_name='descriptions', on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.title
+        return self.title + '(' + self.race.name + ')'
 
 
 class RacePlayingFor(models.Model):
@@ -38,4 +38,4 @@ class RacePlayingFor(models.Model):
     race = models.ForeignKey('Race',  related_name='playingforinformations', on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.text
+        return self.text + '(' + self.race.name + ')'
