@@ -18,11 +18,19 @@ from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingF
 
 class RacesView(viewsets.ViewSet):
     def list(self, request):
+        """
+        Получение списка рас
+        """
         races = Race.objects.all()                
         serializer = RaceListSerializer(races, many=True)
         return Response({"races": serializer.data})
 
     def retrieve(self, request, pk=None):
+        """
+        Получение расы по идентификатору
+
+        pk - идентификатор расы
+        """
         queryset = Race.objects.all()
         race = get_object_or_404(queryset, pk=pk)
         serializer = RaceSerializer(race)        
