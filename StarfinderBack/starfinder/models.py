@@ -16,6 +16,14 @@ class Race(models.Model):
     def __str__(self):
         return self.name
 
+class SubRace(models.Model):
+    name = models.CharField(max_length =255) # название подрасы
+    description = models.TextField() # информация
+    race = models.ForeignKey('Race',  related_name='subraces', on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.race.name + ' '+ self.name
+
 
 class RaceDescription(models.Model):
     title = models.CharField(max_length=255) # заголовок
