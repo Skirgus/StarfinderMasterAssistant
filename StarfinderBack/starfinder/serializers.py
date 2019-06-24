@@ -1,25 +1,28 @@
 from rest_framework import serializers
+from .models import Race, RaceDescription, RacePlayingFor
 
-class RaceSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=255)
-    min_average_weight = serializers.DecimalField(max_digits=5, decimal_places=2)
-    max_average_weight = serializers.DecimalField(max_digits=5, decimal_places=2)
-    min_average_height = serializers.DecimalField(max_digits=5, decimal_places=2)
-    max_average_height = serializers.DecimalField(max_digits=5, decimal_places=2)
-    age_of_majority = serializers.IntegerField()
-    basic_info = serializers.CharField()
-    title_info = serializers.CharField()
-    basic_image = serializers.ImageField()
-    title_image = serializers.ImageField()
+class RaceDescriptionSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = RaceDescription
+        fields = ('title', 'text')
 
 
-class RaceDescriptionSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    text = serializers.CharField()
-    race_id = serializers.IntegerField()
+class RacePlayingForSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = RacePlayingFor
+        fields = ('title', 'text')
 
 
-class RacePlayingForSerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    text = serializers.CharField()
-    race_id = serializers.IntegerField()
+class RaceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Race
+        fields = ('id', 'name', 'title_info', 'title_image')
+
+
+class RaceSerializer(serializers.ModelSerializer):
+    descriptions = RaceDescriptionSerializer(many=True, read_only=True)
+    playingforinformations = RacePlayingForSerializer(many=True, read_only=True)
+    class Meta:
+        model = Race
+        fields = ('id', 'name', 'basic_info', 'basic_image', 'min_average_weight', 'max_average_weight',
+         'min_average_height', 'max_average_height', 'age_of_majority', 'descriptions', 'playingforinformations')
