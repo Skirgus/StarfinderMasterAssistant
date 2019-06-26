@@ -8,7 +8,7 @@ class SexChoice(Enum):
     Femail = "Женский"
 
 
-class СharacteristicChoice(Enum):
+class AbilityChoice(Enum):
     """Характеристика"""
     STR = "Сила"
     DEX = "Ловкость"
@@ -34,6 +34,46 @@ class Race(models.Model):
     
     def __str__(self):
         return self.name
+
+
+class Alignment(models.Model):
+    """Мировозрение"""
+    class Meta:
+        unique_together = (("lawfull_chaotic", "good_evil"),)
+
+    LAWFULL = 0
+    NEUTRAL = 1
+    CHAOTIC = 2
+    LAWFULL_CHAOTIC_CHOICES = (
+        (LAWFULL, 'Принципиальный'),
+        (NEUTRAL, 'Нейтральный'),
+        (CHAOTIC, 'Хаотичный')
+    )
+
+    GOOD = 0
+    EVIL = 2
+    GOOD_EVIL_CHOICES =(
+        (GOOD, 'Добрый'),
+        (NEUTRAL, 'Нейтральный'),
+        (EVIL, 'Злой')
+    )    
+
+    lawfull_chaotic = models.IntegerField(choices=LAWFULL_CHAOTIC_CHOICES, default=NEUTRAL) # принципиальный-хаотичный
+    good_evil = models.IntegerField(choices=GOOD_EVIL_CHOICES, default=NEUTRAL) # добрый-злой
+    name = models.CharField(max_length =255) # название подрасы
+    description = models.TextField() # описание
+
+    def __str__(self):
+        return self.name
+
+class Deity(models.Model):
+    """Божество"""
+    name = models.CharField(max_length =255) # имя
+    alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
+    portfolios = models.CharField(max_length =255) # область интересов
+    description = models.TextField()
+    symbol = models.ImageField(upload_to='deities/', null=True, blank=True) # изображение
+
 
 class SubRace(models.Model):
     """Подраса"""
@@ -70,33 +110,98 @@ class RacePlayingFor(models.Model):
     def __str__(self):
         return self.text + '(' + self.race.name + ')'
 
+
 class Theme(models.Model):
     """Тема"""
     name = models.CharField(max_length=255) # название темы
-    age_of_majority = models.IntegerField() # возраст совершеннолетия
     basic_info = models.TextField() # базовая информация
     title_info = models.TextField() # информация для списка
     basic_image = models.ImageField(upload_to='themes/', null=True, blank=True) # изображение
     title_image = models.ImageField(upload_to='themes/', null=True, blank=True) # миниатюра для списка
-    base_characteristic = models.CharField(max_length=5, 
+    base_ability = models.CharField(max_length=5, 
                             choices=[(tag, tag.value) 
-                            for tag in СharacteristicChoice], null=True)  # базовая характеристика
+                            for tag in AbilityChoice], null=True)  # базовая характеристика
 
-    
-class Character(model.Model): 
+
+class GameClass(models.Model):
+    """Класс"""
+    name = models.CharField(max_length=255) # название темы
+    basic_info = models.TextField() # базовая информация
+    title_info = models.TextField() # информация для списка
+    basic_image = models.ImageField(upload_to='classes/', null=True, blank=True) # изображение
+    title_image = models.ImageField(upload_to='classes/', null=True, blank=True) # миниатюра для списка
+    main_ability = models.CharField(max_length=5, 
+                            choices=[(tag, tag.value) 
+                            for tag in AbilityChoice], null=True)  # основная характеристика
+    hit_points_on_level = models.IntegerField() # пункты здоровья за уровень
+    stamina_point_on_level = models.IntegerField() # пункты живучести за уровень (прибавляются вместе с модификатором выносливости)                       
+
+
+class Skill(models.Model):
+    """Навык"""
+    name = models.CharField(max_length=255) # название
+    ability = models.CharField(max_length=5, 
+                            choices=[(tag, tag.value) 
+                            for tag in AbilityChoice], null=True)  # основная характеристика
+    without_learning = models.BooleanField(default=True) # можно повышать без изучения
+    armor_penalty_applies = models.BooleanField(default=False) # применяется штраф на броню
+    description = models.TextField() # описание
+    need_additional_info = models.BooleanField(default=False) # необходима дополнительная информация
+
+
+class Character(models.Model): 
     """Персонаж""" 
-    user = models.ForeignKey('User',  related_name='characters', on_delete=models.CASCADE)      
-    name = models.CharField(max_length=255, unique=True, message="") # имя персонажа
+    user = models.ForeignKey('auth.User',  related_name='characters', on_delete=models.CASCADE)      
+    name = models.CharField(max_length=255, unique=True) # имя персонажа
     portrait = models.ImageField(upload_to='character_portraits/', null=True, blank=True) # портрет персонажа
     sex = models.CharField(max_length=5, choices=[(tag, tag.value) for tag in SexChoice])  # пол
     description = models.TextField() # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
+    theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
+    alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
+    deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
     сharacteristic_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
+    skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
+    level = models.IntegerField() # уровень
+    basic_attack_bonus = models.IntegerField() # базовый модификатор атаки
+    basic_fortitude = models.IntegerField() # базовая стойкость
+    basic_reflex = models.IntegerField() # базовая реакция
+    basic_will = models.IntegerField() # базовая воля
+    hit_points = models.IntegerField() # пункты здоровья
+    stamina_points = models.IntegerField() # пункты живучести
+    resolve_points = models.IntegerField() # пункты решимости
 
 
-class CharacteristicValue(model.Model):
+class CharacterGameClass(models.Model):  
+    """Класс персонажа"""
+    class Meta:
+        unique_together = (("character", "game_class"),)  
+    character = models.ForeignKey('Character',  related_name='gameclasses', on_delete=models.CASCADE) # персонаж
+    game_class = models.ForeignKey('GameClass', on_delete=models.PROTECT) # игровой класс
+    level = models.IntegerField() # уровень в классе персонажа
+
+
+class CharacterSkillValue(models.Model):    
+    """Значение навыка"""
+    class Meta:
+        unique_together = (("character", "skill"),)  
+    character = models.ForeignKey('Character',  related_name='skillvalues', on_delete=models.CASCADE) # персонаж
+    skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # игровой класс
+    skill_learned = models.BooleanField() # признак изученности навыка
+    additional_info = models.CharField(max_length =255) # дополнительная информация
+    skill_points = models.IntegerField() # пункты вложенные в навык
+    additional_info = models.CharField(max_length=255) # дополнительная информация (например указание конкретной профессии)
+
+
+class AbilityValue(models.Model):
     """Значение характеристики"""
-    character = models.ForeignKey('Character',  related_name='characteristicvalues', on_delete=models.CASCADE) # характеристика
+    class Meta:
+        unique_together = (("character", "ability"),)
+
+    ability = models.CharField(max_length=5, 
+                            choices=[(tag, tag.value) 
+                            for tag in AbilityChoice], null=False)  # характеристика  
+    character = models.ForeignKey('Character',  related_name='abilityvalues', on_delete=models.CASCADE) # персонаж
     value = models.IntegerField() # значение характеристики
     temp_value = models.IntegerField() # временное значение характеристики
 
