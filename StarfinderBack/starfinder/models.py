@@ -118,30 +118,37 @@ class Theme(models.Model):
     title_info = models.TextField() # информация для списка
     basic_image = models.ImageField(upload_to='themes/', null=True, blank=True) # изображение
     title_image = models.ImageField(upload_to='themes/', null=True, blank=True) # миниатюра для списка
-    base_ability = models.CharField(max_length=5, 
-                            choices=[(tag, tag.value) 
-                            for tag in AbilityChoice], null=True)  # базовая характеристика
+    base_ability = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in AbilityChoice], null=True, blank=True)  # базовая характеристика
+                          
+    def __str__(self):
+        return self.name
 
 
 class GameClass(models.Model):
     """Класс"""
-    name = models.CharField(max_length=255) # название темы
+    name = models.CharField(max_length=255) # название класса
     basic_info = models.TextField() # базовая информация
     title_info = models.TextField() # информация для списка
     basic_image = models.ImageField(upload_to='classes/', null=True, blank=True) # изображение
     title_image = models.ImageField(upload_to='classes/', null=True, blank=True) # миниатюра для списка
-    main_ability = models.CharField(max_length=5, 
-                            choices=[(tag, tag.value) 
-                            for tag in AbilityChoice], null=True)  # основная характеристика
+    main_ability = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in AbilityChoice])  # основная характеристика
     hit_points_on_level = models.IntegerField() # пункты здоровья за уровень
-    stamina_point_on_level = models.IntegerField() # пункты живучести за уровень (прибавляются вместе с модификатором выносливости)                       
+    stamina_point_on_level = models.IntegerField() # пункты живучести за уровень (прибавляются вместе с модификатором выносливости)
+    skill_point_on_level = models.IntegerField()  # пункты навыков за уровень (прибавляются вместе с модификатором интелекта)     
+    
+    def __str__(self):
+        return self.name                 
 
 
 class Skill(models.Model):
     """Навык"""
     name = models.CharField(max_length=255) # название
     ability = models.CharField(max_length=5, 
-                            choices=[(tag, tag.value) 
+                            choices=[(tag.name, tag.value) 
                             for tag in AbilityChoice], null=True)  # основная характеристика
     without_learning = models.BooleanField(default=True) # можно повышать без изучения
     armor_penalty_applies = models.BooleanField(default=False) # применяется штраф на броню
@@ -198,7 +205,7 @@ class AbilityValue(models.Model):
     class Meta:
         unique_together = (("character", "ability"),)
 
-    ability = models.CharField(max_length=5, 
+    ability = models.CharField(max_length=255, 
                             choices=[(tag, tag.value) 
                             for tag in AbilityChoice], null=False)  # характеристика  
     character = models.ForeignKey('Character',  related_name='abilityvalues', on_delete=models.CASCADE) # персонаж
