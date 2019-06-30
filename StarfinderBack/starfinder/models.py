@@ -17,6 +17,18 @@ class AbilityChoice(Enum):
     WIS = "Мудрость"
     CHA = "Харизма"
 
+class CharacterPropertiesChoice(Enum):
+    """Свойства персонажа"""
+    basic_attack_bonus = "Базовый модификатор атаки"
+    basic_fortitude = "Базовая стойкость"
+    basic_reflex = "Базовая реакция"
+    basic_will = "Базовая воля"
+    hit_points = "Пункты здоровья"
+    stamina_points = "Пункты живучести"
+    resolve_points = "Пункты решимости"
+    ability_pool = "Очки характеристик доступные для распределения"
+    skill_points_pool = "Очки навыков доступные для распределения"
+
 
 # Create your models here.
 class Race(models.Model):
@@ -161,13 +173,13 @@ class Character(models.Model):
     user = models.ForeignKey('auth.User',  related_name='characters', on_delete=models.CASCADE)      
     name = models.CharField(max_length=255, unique=True) # имя персонажа
     portrait = models.ImageField(upload_to='character_portraits/', null=True, blank=True) # портрет персонажа
-    sex = models.CharField(max_length=5, choices=[(tag, tag.value) for tag in SexChoice])  # пол
+    sex = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
     description = models.TextField() # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
-    сharacteristic_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
+    ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
     level = models.IntegerField() # уровень
     basic_attack_bonus = models.IntegerField() # базовый модификатор атаки
@@ -193,7 +205,7 @@ class CharacterSkillValue(models.Model):
     class Meta:
         unique_together = (("character", "skill"),)  
     character = models.ForeignKey('Character',  related_name='skillvalues', on_delete=models.CASCADE) # персонаж
-    skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # игровой класс
+    skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # навык
     skill_learned = models.BooleanField() # признак изученности навыка
     additional_info = models.CharField(max_length =255) # дополнительная информация
     skill_points = models.IntegerField() # пункты вложенные в навык
@@ -206,7 +218,7 @@ class AbilityValue(models.Model):
         unique_together = (("character", "ability"),)
 
     ability = models.CharField(max_length=255, 
-                            choices=[(tag, tag.value) 
+                            choices=[(tag.name, tag.value) 
                             for tag in AbilityChoice], null=False)  # характеристика  
     character = models.ForeignKey('Character',  related_name='abilityvalues', on_delete=models.CASCADE) # персонаж
     value = models.IntegerField() # значение характеристики
@@ -217,3 +229,41 @@ class AbilityValue(models.Model):
 
     def get_temp_modifier(self):
         return temp_value//2 - 5
+
+
+class BaseRule(models.Model):
+    """Базовый класс для правил"""
+    class Meta:
+        abstract = True
+    name = models.CharField(max_length=255, null=True, blank=True) # название правила
+    description = models.CharField(max_length=255, null=True, blank=True) # описание правила
+
+
+class RulesActingOnCharLevelUp(BaseRule):
+    """Базовый класс для правил действующих на персонажа при повышении уровня"""
+    class Meta:
+        abstract = True
+    level = models.IntegerField() # уровень при достижении которого срабатывает правило
+    ability = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in AbilityChoice], null=True, blank=True)  # характеристика
+    skill = models.ForeignKey('Skill', on_delete=models.PROTECT, null=True, blank=True) # навык
+    character_property = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in CharacterPropertiesChoice], null=True, blank=True)  # свойство персонажа  
+    change_to = models.IntegerField() # значение на которое изменяется параметр
+
+
+class RaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
+    """Правила расы действующие при повышении в уровне"""
+    race = models.ForeignKey('Race',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # раса
+
+    
+class ThemeRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
+    """Правила темы действующие при повышении в уровне"""
+    theme = models.ForeignKey('Theme',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
+    
+    
+class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
+    """Правила класса действующие при повышении в уровне"""
+    game_class = models.ForeignKey('Theme',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема

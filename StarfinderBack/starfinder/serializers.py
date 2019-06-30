@@ -58,3 +58,11 @@ class GameClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameClass
         fields = ('id', 'name', 'basic_info', 'basic_image', 'main_ability', 'hit_points_on_level', 'stamina_point_on_level', 'skill_point_on_level')
+
+        
+class CharacterListSerializer(serializers.ModelSerializer):
+    race = serializers.CharField(read_only=True, source="race.name")
+    theme = serializers.CharField(read_only=True, source="theme.name")
+    class Meta:
+        model = Theme
+        fields = ('id', 'name', 'description', 'portrait', 'race', 'theme')

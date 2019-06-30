@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -12,9 +12,9 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass
+from .models import Theme, GameClass, Character
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer
-from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer
+from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer
 
 # Create your views here.
 
@@ -79,3 +79,12 @@ class GameClassView(viewsets.ViewSet):
         game_class = get_object_or_404(queryset, pk=pk)
         serializer = GameClassSerializer(game_class)        
         return Response(serializer.data)
+
+
+class CharacterView(viewsets.ViewSet):
+    def list(self, request):
+        """Получение списка персонажей"""
+        queryset = Character.objects.all()
+        userCharacters = get_list_or_404(queryset, user=request.user)
+        serializer = CharacterListSerializer(userCharacters, many=True)
+        return Response({"characters": serializer.data})
