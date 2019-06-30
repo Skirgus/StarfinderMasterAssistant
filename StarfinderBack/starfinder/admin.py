@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Race, RaceDescription, RacePlayingFor, SubRace
+from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Alignment, Deity, Theme, GameClass, Skill
 
 # Register your models here.
@@ -7,7 +7,7 @@ from .models import Alignment, Deity, Theme, GameClass, Skill
 admin.site.register(Race)
 admin.site.register(RaceDescription)
 admin.site.register(RacePlayingFor)
-admin.site.register(SubRace)
+admin.site.register(Subrace)
 admin.site.register(Alignment)
 admin.site.register(Deity)
 admin.site.register(Theme)

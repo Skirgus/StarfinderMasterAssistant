@@ -75,7 +75,7 @@ class Deity(models.Model):
     symbol = models.ImageField(upload_to='deities/', null=True, blank=True) # изображение
 
 
-class SubRace(models.Model):
+class Subrace(models.Model):
     """Подраса"""
     name = models.CharField(max_length =255) # название подрасы
     description = models.TextField() # информация

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Race, RaceDescription, RacePlayingFor, SubRace
+from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
@@ -13,14 +13,14 @@ class RacePlayingForSerializer(serializers.ModelSerializer):
         model = RacePlayingFor
         fields = ('title', 'text')
 
-class SubRaceSerializer(serializers.ModelSerializer):
+class SubraceSerializer(serializers.ModelSerializer):
      class Meta:
-        model = SubRace
+        model = Subrace
         fields = ('name', 'description')
 
 
 class RaceListSerializer(serializers.ModelSerializer):
-    subraces = SubRaceSerializer(many=True, read_only=True)
+    subraces = SubraceSerializer(many=True, read_only=True)
     class Meta:
         model = Race
         fields = ('id', 'name', 'title_info', 'title_image', 'subraces')
@@ -29,7 +29,7 @@ class RaceListSerializer(serializers.ModelSerializer):
 class RaceSerializer(serializers.ModelSerializer):
     descriptions = RaceDescriptionSerializer(many=True, read_only=True)
     playingforinformations = RacePlayingForSerializer(many=True, read_only=True)
-    subraces = SubRaceSerializer(many=True, read_only=True)
+    subraces = SubraceSerializer(many=True, read_only=True)
     class Meta:
         model = Race
         fields = ('id', 'name', 'basic_info', 'basic_image', 'min_average_weight', 'max_average_weight',
