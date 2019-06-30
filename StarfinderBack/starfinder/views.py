@@ -12,7 +12,9 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
+from .models import Theme, GameClass
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer
+from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer
 
 # Create your views here.
 
@@ -34,4 +36,46 @@ class RacesView(viewsets.ViewSet):
         queryset = Race.objects.all()
         race = get_object_or_404(queryset, pk=pk)
         serializer = RaceSerializer(race)        
+        return Response(serializer.data)
+
+
+class ThemeView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка тем
+        """
+        theme = Theme.objects.all()                
+        serializer = ThemeListSerializer(theme, many=True)
+        return Response({"themes": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение темы по идентификатору
+
+        pk - идентификатор темы
+        """
+        queryset = Theme.objects.all()
+        theme = get_object_or_404(queryset, pk=pk)
+        serializer = ThemeSerializer(theme)        
+        return Response(serializer.data)
+
+        
+class GameClassView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка классов
+        """
+        game_class = GameClass.objects.all()                
+        serializer = GameClassListSerializer(game_class, many=True)
+        return Response({"game_classes": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение класса по идентификатору
+
+        pk - идентификатор класса
+        """
+        queryset = GameClass.objects.all()
+        game_class = get_object_or_404(queryset, pk=pk)
+        serializer = GameClassSerializer(game_class)        
         return Response(serializer.data)
