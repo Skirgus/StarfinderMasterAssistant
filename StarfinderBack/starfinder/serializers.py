@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
-from .models import Theme, GameClass
+from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
+from .models import Character
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -64,5 +65,37 @@ class CharacterListSerializer(serializers.ModelSerializer):
     race = serializers.CharField(read_only=True, source="race.name")
     theme = serializers.CharField(read_only=True, source="theme.name")
     class Meta:
-        model = Theme
+        model = Character
         fields = ('id', 'name', 'description', 'portrait', 'race', 'theme')
+
+
+class AbilityValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbilityValue
+        fields = ('ability', 'value', 'temp_value')
+
+
+class CharacterSkillValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CharacterSkillValue
+        fields = ('skill', 'skill_learned', 'additional_info', 'skill_points')
+
+
+class CharacterGameClassSerializer(serializers.ModelSerializer):
+    game_class = GameClassSerializer(many=False, read_only=True)
+    class Meta:
+        model = CharacterGameClass
+        fields = ('level', 'game_class')
+
+
+class CharacterSerializer(serializers.ModelSerializer):
+    abilityvalues = AbilityValueSerializer(many=True, read_only=True)
+    skillvalues = CharacterSkillValueSerializer(many=True, read_only=True)
+    gameclasses = CharacterGameClassSerializer(many=True, read_only=True)
+    race = RaceSerializer(many=False, read_only = False)
+    theme = ThemeSerializer(many=False, read_only = False)    
+    class Meta:
+        model = Character
+        fields = ('name', 'portrait', 'sex', 'description', 'race', 'theme', 'alignment', 'deity', 'ability_pool',
+            'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
+            'stamina_points', 'resolve_points')

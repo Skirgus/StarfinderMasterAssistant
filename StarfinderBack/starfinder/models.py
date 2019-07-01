@@ -188,7 +188,11 @@ class Character(models.Model):
     basic_will = models.IntegerField() # базовая воля
     hit_points = models.IntegerField() # пункты здоровья
     stamina_points = models.IntegerField() # пункты живучести
-    resolve_points = models.IntegerField() # пункты решимости
+    resolve_points = models.IntegerField() # пункты решимости 
+
+    def get_ability(self, tag):
+        ability_value = (ability_value for ability_value in self.abilityvalues if ability_value.ability == tag)
+        return ability_value
 
 
 class CharacterGameClass(models.Model):  
@@ -207,9 +211,8 @@ class CharacterSkillValue(models.Model):
     character = models.ForeignKey('Character',  related_name='skillvalues', on_delete=models.CASCADE) # персонаж
     skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # навык
     skill_learned = models.BooleanField() # признак изученности навыка
-    additional_info = models.CharField(max_length =255) # дополнительная информация
-    skill_points = models.IntegerField() # пункты вложенные в навык
-    additional_info = models.CharField(max_length=255) # дополнительная информация (например указание конкретной профессии)
+    additional_info = models.CharField(max_length =255) # дополнительная информация (например указание конкретной профессии)
+    skill_points = models.IntegerField() # пункты вложенные в навыкs
 
 
 class AbilityValue(models.Model):
@@ -266,4 +269,4 @@ class ThemeRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     
 class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила класса действующие при повышении в уровне"""
-    game_class = models.ForeignKey('Theme',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
+    game_class = models.ForeignKey('GameClass',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
