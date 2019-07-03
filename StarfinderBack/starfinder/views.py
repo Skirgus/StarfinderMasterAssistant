@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
 from .models import Theme, GameClass, Character
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer
-from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer
+from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
 
 # Create your views here.
 
@@ -88,3 +88,14 @@ class CharacterView(viewsets.ViewSet):
         userCharacters = get_list_or_404(queryset, user=request.user)
         serializer = CharacterListSerializer(userCharacters, many=True)
         return Response({"characters": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение персонажа по идентификатору
+
+        pk - идентификатор персонажа
+        """
+        queryset = Character.objects.all()
+        character = get_object_or_404(queryset, pk=pk)
+        serializer = CharacterSerializer(character)        
+        return Response(serializer.data)
