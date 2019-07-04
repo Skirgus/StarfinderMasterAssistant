@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'starfinder',
-    'starfinder.dto'
+    'starfinder.dto',
+    'starfinder.builders'
 ]
 
 MIDDLEWARE = [

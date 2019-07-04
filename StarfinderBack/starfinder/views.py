@@ -12,8 +12,8 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass, Character
-from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer
+from .models import Theme, GameClass, Character, Deity
+from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
 
 # Create your views here.
@@ -59,6 +59,26 @@ class ThemeView(viewsets.ViewSet):
         serializer = ThemeSerializer(theme)        
         return Response(serializer.data)
 
+class DeityView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка божеств
+        """
+        deity = Deity.objects.all()                
+        serializer = DeitySerializer(deity, many=True)
+        return Response({"deities": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение божеств по идентификатору
+
+        pk - идентификатор божества
+        """
+        queryset = Deity.objects.all()
+        deity = get_object_or_404(queryset, pk=pk)
+        serializer = DeitySerializer(deity)        
+        return Response(serializer.data)
+
         
 class GameClassView(viewsets.ViewSet):
     def list(self, request):
@@ -99,3 +119,13 @@ class CharacterView(viewsets.ViewSet):
         character = get_object_or_404(queryset, pk=pk)
         serializer = CharacterSerializer(character)        
         return Response(serializer.data)
+
+    def create_character(self, request):
+        """Создание персонажа"""
+        name = request.POST.get("name"),
+        race_id = request.POST.get("race_id")
+        theme_id = request.POST.get("theme_id")
+        alignment_id = request.POST.get("alignment_id")
+        deity_id = request.POST.get("deity_id")
+        class_id = request.POST.get("class_id")
+        gender = request.POST.get("gender")
