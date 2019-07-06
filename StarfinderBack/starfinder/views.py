@@ -15,6 +15,8 @@ from .models import Race, RaceDescription, RacePlayingFor
 from .models import Theme, GameClass, Character, Deity
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
+from .builders import CharacterBuilder
+import json
 
 # Create your views here.
 
@@ -120,12 +122,28 @@ class CharacterView(viewsets.ViewSet):
         serializer = CharacterSerializer(character)        
         return Response(serializer.data)
 
-    def create_character(self, request):
+    def post(self, request):
         """Создание персонажа"""
-        name = request.POST.get("name"),
-        race_id = request.POST.get("race_id")
-        theme_id = request.POST.get("theme_id")
-        alignment_id = request.POST.get("alignment_id")
-        deity_id = request.POST.get("deity_id")
-        class_id = request.POST.get("class_id")
-        gender = request.POST.get("gender")
+        name = request.data['name']
+        if name is None:
+            raise ValueError("Не задано имя")
+        race_id = request.data['race_id']
+        if race_id is None:
+            raise ValueError("Не задана раса")            
+        theme_id = request.data['theme_id']
+        if theme_id is None:
+            raise ValueError("Не задана тема")
+        alignment_id = request.data['alignment_id']
+        if alignment_id is None:
+            raise ValueError("Не задано мировоззрение")
+        deity_id = request.data['deity_id']
+        class_id = request.data['class_id']
+        if class_id is None:
+            raise ValueError("Не задан класс")
+        gender = request.data['gender']
+
+        builder = CharacterBuilder()
+        character = builder.character(name, race_id, theme_id, alignment_id,
+                     deity_id, class_id, gender)
+        serializer = CharacterSerializer(character)        
+        return Response(serializer.data)

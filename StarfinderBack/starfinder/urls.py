@@ -13,5 +13,6 @@ urlpatterns = [
     path('classes/<int:pk>', GameClassView.as_view({'get': 'retrieve'})),
     path('characters/', CharacterView.as_view({'get': 'list'})),
     path('characters/<int:pk>', CharacterView.as_view({'get': 'retrieve'})),
+    path('characters/', CharacterView.as_view({'post': 'post'})),
     path('login/', login)    
 ]

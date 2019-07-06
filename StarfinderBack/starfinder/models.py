@@ -2,7 +2,7 @@ from django.db import models
 from enum import Enum
 
 
-class GenderChoice(Enum):
+class SexChoice(Enum):
     """Пол"""
     Male = "Мужской"
     Femail = "Женский"
@@ -174,7 +174,7 @@ class Character(models.Model):
     user = models.ForeignKey('auth.User',  related_name='characters', on_delete=models.CASCADE)      
     name = models.CharField(max_length=255, unique=True) # имя персонажа
     portrait = models.ImageField(upload_to='character_portraits/', null=True, blank=True) # портрет персонажа
-    gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in GenderChoice])  # пол
+    gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
     description = models.TextField() # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
