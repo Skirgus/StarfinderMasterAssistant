@@ -19,9 +19,9 @@ class CharacterBuilder():
     def reset(self) -> None:
         self._character = Character()
 
-    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender) -> Character:        
+    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender, user) -> Character:        
         character = self._character
-        self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id)
+        self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id, user)
         self.set_class(class_id)
         self.create_character_abilities()
         self.create_character_skills()
@@ -29,7 +29,7 @@ class CharacterBuilder():
         self.reset()
         return character
 
-    def set_base_fields(self, name, alignment_id, deity_id, gender, race_id, theme_id):
+    def set_base_fields(self, name, alignment_id, deity_id, gender, race_id, theme_id, user):
         character = self._character
         character.name = name
         character.gender = gender
@@ -40,6 +40,7 @@ class CharacterBuilder():
         character.level = 1
         if deity_id is not None:
             character.deity = Deity.objects.get(id=deity_id)
+        character.user = user
         character.save()
     
     def set_class(self, class_id):

@@ -183,13 +183,13 @@ class Character(models.Model):
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
     level = models.IntegerField() # уровень
-    basic_attack_bonus = models.IntegerField() # базовый модификатор атаки
-    basic_fortitude = models.IntegerField() # базовая стойкость
-    basic_reflex = models.IntegerField() # базовая реакция
-    basic_will = models.IntegerField() # базовая воля
-    hit_points = models.IntegerField() # пункты здоровья
-    stamina_points = models.IntegerField() # пункты живучести
-    resolve_points = models.IntegerField() # пункты решимости 
+    basic_attack_bonus = models.IntegerField(default=0) # базовый модификатор атаки
+    basic_fortitude = models.IntegerField(default=0) # базовая стойкость
+    basic_reflex = models.IntegerField(default=0) # базовая реакция
+    basic_will = models.IntegerField(default=0) # базовая воля
+    hit_points = models.IntegerField(default=0) # пункты здоровья
+    stamina_points = models.IntegerField(default=0) # пункты живучести
+    resolve_points = models.IntegerField(default=0) # пункты решимости 
 
     def get_ability(self, tag):
         ability_value = (ability_value for ability_value in self.abilityvalues if ability_value.ability == tag)

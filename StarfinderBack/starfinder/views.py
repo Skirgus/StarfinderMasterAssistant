@@ -141,9 +141,9 @@ class CharacterView(viewsets.ViewSet):
         if class_id is None:
             raise ValueError("Не задан класс")
         gender = request.data['gender']
-
+        user = request.user
         builder = CharacterBuilder()
         character = builder.character(name, race_id, theme_id, alignment_id,
-                     deity_id, class_id, gender)
+                     deity_id, class_id, gender, user)
         serializer = CharacterSerializer(character)        
         return Response(serializer.data)
