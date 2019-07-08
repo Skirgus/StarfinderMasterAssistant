@@ -13,7 +13,7 @@ class AbilityChoice(Enum):
     STR = "Сила"
     DEX = "Ловкость"
     CON = "Выносливость"
-    Int = "Интеллект"
+    INT = "Интеллект"
     WIS = "Мудрость"
     CHA = "Харизма"
 

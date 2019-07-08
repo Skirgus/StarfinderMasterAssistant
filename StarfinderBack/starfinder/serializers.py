@@ -104,4 +104,4 @@ class CharacterSerializer(serializers.ModelSerializer):
         model = Character
         fields = ('name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'ability_pool',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
-            'stamina_points', 'resolve_points')
+            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues')
