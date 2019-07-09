@@ -2,6 +2,7 @@ import django
 from .models import Character, Race, Alignment, Deity, Theme, GameClass
 from .models import AbilityChoice, Skill
 
+
 class CharacterBuilder():    
     """
     Строитель персонажа
@@ -19,15 +20,21 @@ class CharacterBuilder():
     def reset(self) -> None:
         self._character = Character()
 
-    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender, user) -> Character:        
-        character = self._character
-        self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id, user)
-        self.set_class(class_id)
-        self.create_character_abilities()
-        self.create_character_skills()
+    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender, user) -> Character:  
+        try:      
+            character = self._character
+            self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id, user)
+            self.set_class(class_id)
+            self.create_character_abilities()
+            self.create_character_skills()
 
-        self.reset()
-        return character
+            character.go_to_level(1, class_id)
+            self.reset()
+            return character
+        except Exception:
+            if character.id is not None:
+                character.delete()
+            raise Exception            
 
     def set_base_fields(self, name, alignment_id, deity_id, gender, race_id, theme_id, user):
         character = self._character

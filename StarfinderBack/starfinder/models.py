@@ -1,11 +1,19 @@
 from django.db import models
+from django.db.models import Q
 from enum import Enum
+from itertools import chain
 
 
 class SexChoice(Enum):
     """Пол"""
     Male = "Мужской"
     Femail = "Женский"
+
+    
+class OperationChoice(Enum):
+    """Операция"""
+    Add = "Прибавить"
+    Set = "Установить"
 
 
 class AbilityChoice(Enum):
@@ -192,8 +200,67 @@ class Character(models.Model):
     resolve_points = models.IntegerField(default=0) # пункты решимости 
 
     def get_ability(self, tag):
-        ability_value = (ability_value for ability_value in self.abilityvalues if ability_value.ability == tag)
+        """Получение характеристики персонажа"""
+        ability_value =  self.abilityvalues.get(ability=tag)
         return ability_value
+
+    def go_to_level(self, level, class_id):
+        """Обработка перехода на указанный уровень"""
+        race_rules = self.race.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        theme_rules = self.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        
+        character_game_class = self.gameclasses.get(game_class_id = class_id)
+
+        class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+
+        rules = list(chain(race_rules, theme_rules, class_rules))
+
+        for rule in rules:
+            if rule.operation == OperationChoice.Add.name:
+                if rule.ability is not None:               
+                    self.add_ability_value(rule.ability, rule.change_to)
+                elif rule.skill is not None:
+                    self.add_skill_value(rule.skill, rule.change_to)
+                elif rule.character_property is not None:
+                    self.__dict__[rule.character_property] += rule.change_to
+            elif rule.operation == OperationChoice.Set.name:
+                if rule.ability is not None:               
+                    self.set_ability_value(rule.ability, rule.change_to)
+                elif rule.skill is not None:
+                    self.set_skill_value(rule.skill, rule.change_to)
+                elif rule.character_property is not None:
+                    self.__dict__[rule.character_property] = rule.change_to
+
+        int_ability = self.get_ability(AbilityChoice.INT.name)
+        self.skill_points_pool += int_ability.get_modifier()
+
+        con_ability = self.get_ability(AbilityChoice.CON.name)
+        self.stamina_points += con_ability.get_modifier()
+        self.save()
+
+    def add_ability_value(self, ability, value):
+        """Прибавить значение к характеристике"""
+        ability_value = self.get_ability(ability)
+        ability_value.value += value
+        ability_value.save()        
+
+    def set_ability_value(self, ability, value):
+        """Задать значение характеристики"""
+        ability_value = self.self.get_ability(ability)
+        ability_value.value = value
+        ability_value.save()        
+
+    def add_skill_value(self, skill, value):
+        """Прибавить значение к навыку"""
+        character_skill = self.skillvalues.get(skill=skill)
+        character_skill.skill_points += value
+        character_skill.save()        
+
+    def set_skill_value(self, skill, value):
+        """Задать значение навыка"""
+        character_skill = self.skillvalues.get(skill=skill)
+        character_skill.skill_points = value
+        character_skill.save()      
 
 
 class CharacterGameClass(models.Model):  
@@ -229,10 +296,10 @@ class AbilityValue(models.Model):
     temp_value = models.IntegerField() # временное значение характеристики
 
     def get_modifier(self):
-        return value//2 - 5
+        return self.value//2 - 5
 
     def get_temp_modifier(self):
-        return temp_value//2 - 5
+        return self.temp_value//2 - 5
 
 
 class BaseRule(models.Model):
@@ -240,7 +307,7 @@ class BaseRule(models.Model):
     class Meta:
         abstract = True
     name = models.CharField(max_length=255, null=True, blank=True) # название правила
-    description = models.CharField(max_length=255, null=True, blank=True) # описание правила
+    description = models.TextField(null=True, blank=True) # описание правила
 
 
 class RulesActingOnCharLevelUp(BaseRule):
@@ -256,18 +323,30 @@ class RulesActingOnCharLevelUp(BaseRule):
                             choices=[(tag.name, tag.value) 
                             for tag in CharacterPropertiesChoice], null=True, blank=True)  # свойство персонажа  
     change_to = models.IntegerField() # значение на которое изменяется параметр
+    operation = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in OperationChoice], null=True, blank=True)  # операция
 
 
 class RaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила расы действующие при повышении в уровне"""
     race = models.ForeignKey('Race',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # раса
+    
+    def __str__(self):
+        return self.race.name + ' (' + self.name+ ')'
 
     
 class ThemeRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила темы действующие при повышении в уровне"""
     theme = models.ForeignKey('Theme',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
     
+    def __str__(self):
+        return self.theme.name + ' (' + self.name+ ')'
+    
     
 class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила класса действующие при повышении в уровне"""
     game_class = models.ForeignKey('GameClass',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
+
+    def __str__(self):
+        return self.game_class.name + ' (' + self.name+ ')'
