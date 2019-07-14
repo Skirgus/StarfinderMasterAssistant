@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
-from .models import Theme, GameClass
+from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
+from .models import Character, Deity
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -58,3 +59,49 @@ class GameClassSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameClass
         fields = ('id', 'name', 'basic_info', 'basic_image', 'main_ability', 'hit_points_on_level', 'stamina_point_on_level', 'skill_point_on_level')
+
+        
+class CharacterListSerializer(serializers.ModelSerializer):
+    race = serializers.CharField(read_only=True, source="race.name")
+    theme = serializers.CharField(read_only=True, source="theme.name")
+    class Meta:
+        model = Character
+        fields = ('id', 'name', 'description', 'portrait', 'race', 'theme')
+
+
+class DeitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deity
+        fields = '__all__'
+
+
+class AbilityValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbilityValue
+        fields = ('ability', 'value', 'temp_value')
+
+
+class CharacterSkillValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CharacterSkillValue
+        fields = ('skill', 'skill_learned', 'additional_info', 'skill_points')
+
+
+class CharacterGameClassSerializer(serializers.ModelSerializer):
+    game_class = GameClassSerializer(many=False, read_only=True)
+    class Meta:
+        model = CharacterGameClass
+        fields = ('level', 'game_class')
+
+
+class CharacterSerializer(serializers.ModelSerializer):
+    abilityvalues = AbilityValueSerializer(many=True, read_only=True)
+    skillvalues = CharacterSkillValueSerializer(many=True, read_only=True)
+    gameclasses = CharacterGameClassSerializer(many=True, read_only=True)
+    race = RaceSerializer(many=False, read_only = False)
+    theme = ThemeSerializer(many=False, read_only = False)    
+    class Meta:
+        model = Character
+        fields = ('name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'ability_pool',
+            'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
+            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues')
