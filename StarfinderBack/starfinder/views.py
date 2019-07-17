@@ -147,3 +147,12 @@ class CharacterView(viewsets.ViewSet):
                      deity_id, class_id, gender, user)
         serializer = CharacterSerializer(character)        
         return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        """Изменение персонажа"""
+        queryset = Character.objects.all()
+        character = get_object_or_404(queryset, pk=pk)
+        serializer = CharacterSerializer(character, data=request.data) 
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)

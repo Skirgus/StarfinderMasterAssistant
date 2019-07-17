@@ -183,7 +183,7 @@ class Character(models.Model):
     name = models.CharField(max_length=255, unique=True) # имя персонажа
     portrait = models.ImageField(upload_to='character_portraits/', null=True, blank=True) # портрет персонажа
     gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
-    description = models.TextField() # описание
+    description = models.TextField(null=True, blank=True) # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
@@ -261,6 +261,20 @@ class Character(models.Model):
         character_skill = self.skillvalues.get(skill=skill)
         character_skill.skill_points = value
         character_skill.save()      
+
+    def on_change_ability_value(self, ability_value):
+        if ability_value.ability == AbilityChoice.CON.name:
+            self.on_change_ability_constitution(ability_value)
+    
+    def on_change_ability_constitution(self, ability_value):
+        modifier = ability_value.get_modifier()
+        calculated_stamina_points = 0
+        for char_game_class in self.gameclasses:
+            calculated_stamina_points += (char_game_class.game_class.stamina_point_on_level + modifier) * char_game_class.level
+
+        if self.stamina_points != calculated_stamina_points:
+            self.stamina_points = calculated_stamina_points
+            self.save()           
 
 
 class CharacterGameClass(models.Model):  
