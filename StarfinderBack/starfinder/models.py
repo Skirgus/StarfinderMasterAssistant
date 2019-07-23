@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import Q
 from enum import Enum
 from itertools import chain
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 class SexChoice(Enum):
@@ -269,7 +272,7 @@ class Character(models.Model):
     def on_change_ability_constitution(self, ability_value):
         modifier = ability_value.get_modifier()
         calculated_stamina_points = 0
-        for char_game_class in self.gameclasses:
+        for char_game_class in self.gameclasses.all():
             calculated_stamina_points += (char_game_class.game_class.stamina_point_on_level + modifier) * char_game_class.level
 
         if self.stamina_points != calculated_stamina_points:
@@ -364,3 +367,10 @@ class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
 
     def __str__(self):
         return self.game_class.name + ' (' + self.name+ ')'
+
+#todo надо вынести в отдельный файл, но есть проблемы с импортом, хз почему
+@receiver(post_save, sender=AbilityValue)
+def ability_value_post_save(sender, instance, **kwargs):
+    """Обработка сигнала изменения характеристики"""
+    if not kwargs['created']:
+        instance.character.on_change_ability_value(instance)
