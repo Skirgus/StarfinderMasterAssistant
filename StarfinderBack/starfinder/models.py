@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Q
 from enum import Enum
 from itertools import chain
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, get_list_or_404
 
@@ -178,6 +178,9 @@ class Skill(models.Model):
     armor_penalty_applies = models.BooleanField(default=False) # применяется штраф на броню
     description = models.TextField() # описание
     need_additional_info = models.BooleanField(default=False) # необходима дополнительная информация
+    
+    def __str__(self):
+        return self.name 
 
 
 class Character(models.Model): 
@@ -193,6 +196,7 @@ class Character(models.Model):
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
+    distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки
     level = models.IntegerField() # уровень
     basic_attack_bonus = models.IntegerField(default=0) # базовый модификатор атаки
     basic_fortitude = models.IntegerField(default=0) # базовая стойкость
@@ -264,6 +268,9 @@ class Character(models.Model):
         character_skill = self.skillvalues.get(skill=skill)
         character_skill.skill_points = value
         character_skill.save()      
+ 
+    def add_distributed_skill_points(self, value):        
+            self.distributed_skill_points += value
 
     def on_change_ability_value(self, ability_value):
         if ability_value.ability == AbilityChoice.CON.name:
@@ -277,7 +284,20 @@ class Character(models.Model):
 
         if self.stamina_points != calculated_stamina_points:
             self.stamina_points = calculated_stamina_points
-            self.save()           
+            self.save()   
+
+    def on_change_ability_intelligence(self, ability_value):
+        modifier = ability_value.get_modifier()
+        calculated_int_points = 0
+        for char_game_class in self.gameclasses.all():
+            calculated_int_points += (char_game_class.game_class.skill_point_on_level + modifier) * char_game_class.level
+
+        # считаем сколько должно быть на уровне очков навыков вычитаем оттуда очки навыков в пуле навыков и распределенные очки навыков
+        diff = calculated_int_points - self.skill_points_pool - self.distributed_skill_points 
+
+        if diff != 0:
+            self.skill_points_pool += diff
+            self.save()
 
 
 class CharacterGameClass(models.Model):  
@@ -297,7 +317,7 @@ class CharacterSkillValue(models.Model):
     skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # навык
     skill_learned = models.BooleanField() # признак изученности навыка
     additional_info = models.CharField(max_length =255) # дополнительная информация (например указание конкретной профессии)
-    skill_points = models.IntegerField() # пункты вложенные в навыкs
+    skill_points = models.IntegerField() # пункты вложенные в навык
 
 
 class AbilityValue(models.Model):
@@ -374,3 +394,10 @@ def ability_value_post_save(sender, instance, **kwargs):
     """Обработка сигнала изменения характеристики"""
     if not kwargs['created']:
         instance.character.on_change_ability_value(instance)
+
+@receiver(pre_save, sender=CharacterSkillValue)
+def skill_value_pre_save(sender, instance, update_fields, **kwargs):
+    """Обработка сигнала изменения значения навыка"""
+    new_skill_points = update_fields["skill_points"]
+    changed_on = new_skill_points - instance.skill_points
+    instance.character.add_distributed_skill_points(changed_on)
