@@ -121,7 +121,7 @@ class CharacterSerializer(serializers.ModelSerializer):
         model = Character
         fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'ability_pool',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
-            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues')
+            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points')
 
     def update(self, instance, validated_data):
         ability_values_data = validated_data.pop('abilityvalues')
@@ -140,6 +140,7 @@ class CharacterSerializer(serializers.ModelSerializer):
         instance.hit_points = validated_data.get('hit_points', instance.hit_points)
         instance.stamina_points = validated_data.get('stamina_points', instance.stamina_points)
         instance.stamina_poiresolve_pointsnts = validated_data.get('resolve_points', instance.resolve_points)
+        instance.distributed_skill_points = validated_data.get('distributed_skill_points', instance.distributed_skill_points)
         instance.save()
 
         for ability_value_data in ability_values_data:

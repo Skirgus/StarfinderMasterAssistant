@@ -196,7 +196,9 @@ class Character(models.Model):
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
-    distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки
+    distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки (это поле надо явно менять на клиенте, 
+    # только так будет уверенность что очко вложенной в навык вложенно пользователем из пула очков навыков) на основе него можно будет рассчитать,
+    # сколько очков надо добавить при изменении интеллекта
     level = models.IntegerField() # уровень
     basic_attack_bonus = models.IntegerField(default=0) # базовый модификатор атаки
     basic_fortitude = models.IntegerField(default=0) # базовая стойкость
@@ -253,7 +255,7 @@ class Character(models.Model):
 
     def set_ability_value(self, ability, value):
         """Задать значение характеристики"""
-        ability_value = self.self.get_ability(ability)
+        ability_value = self.get_ability(ability)
         ability_value.value = value
         ability_value.save()        
 
@@ -275,6 +277,8 @@ class Character(models.Model):
     def on_change_ability_value(self, ability_value):
         if ability_value.ability == AbilityChoice.CON.name:
             self.on_change_ability_constitution(ability_value)
+        elif ability_value.ability == AbilityChoice.INT.name:
+            self.on_change_ability_intelligence(ability_value)
     
     def on_change_ability_constitution(self, ability_value):
         modifier = ability_value.get_modifier()
@@ -316,7 +320,7 @@ class CharacterSkillValue(models.Model):
     character = models.ForeignKey('Character',  related_name='skillvalues', on_delete=models.CASCADE) # персонаж
     skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # навык
     skill_learned = models.BooleanField() # признак изученности навыка
-    additional_info = models.CharField(max_length =255) # дополнительная информация (например указание конкретной профессии)
+    additional_info = models.CharField(max_length =255, null=True, blank=True) # дополнительная информация (например указание конкретной профессии)
     skill_points = models.IntegerField() # пункты вложенные в навык
 
 
@@ -394,10 +398,3 @@ def ability_value_post_save(sender, instance, **kwargs):
     """Обработка сигнала изменения характеристики"""
     if not kwargs['created']:
         instance.character.on_change_ability_value(instance)
-
-@receiver(pre_save, sender=CharacterSkillValue)
-def skill_value_pre_save(sender, instance, update_fields, **kwargs):
-    """Обработка сигнала изменения значения навыка"""
-    new_skill_points = update_fields["skill_points"]
-    changed_on = new_skill_points - instance.skill_points
-    instance.character.add_distributed_skill_points(changed_on)
