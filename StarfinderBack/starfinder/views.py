@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import Http404
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
@@ -110,6 +110,17 @@ class CharacterView(viewsets.ViewSet):
         userCharacters = get_list_or_404(queryset, user=request.user)
         serializer = CharacterListSerializer(userCharacters, many=True)
         return Response({"characters": serializer.data})
+
+    @action(detail=True, methods=['get'])
+    def character_blank(self, request, pk=None):
+        """
+        Получение html страницы с листом персонажа
+
+        pk - идентификатор персонажа
+        """
+        queryset = Character.objects.all()
+        character = get_object_or_404(queryset, pk=pk)
+        return render(request, 'character/character_blank.html', {'character': character, 'character_classes': character.gameclasses.all(), 'race': character.race})
 
     def retrieve(self, request, pk=None):
         """

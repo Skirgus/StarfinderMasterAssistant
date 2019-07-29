@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <title>Бланк персонажа</title>           
+    </head>
+    <style>
+        .mainText {           
+            line-height: 0.2;
+            font-size: 12;
+            text-align: center;
+        }
+        .mainSub {     
+            line-height: 0.2;           
+            font-size: 12;          
+            text-align: center;
+            vertical-align: top;
+        }
+    </style>
+    <body>
+    <div>
+            <h2 align="right">Бланк персонажа</h2>
+    </div>
+    <div style="width: 60%;">
+        <div style="margin-bottom: 10px">
+            <div style="width: 20%; float: left; height: 20px">
+                <span style = "line-height: 1;">Имя персонажа:</span>
+            </div>
+            <div style="float: left; width: 80%; height: 20px">
+                <span style = "line-height: 1;">{{character.name}}</span>
+            </div>
+        <div/>
+        <div style="margin-top: 10px">
+            <div style="width: 50%; float: left; height: 20px; border-bottom: 2px solid black; margin-right: 3px;">
+                {% for caracter_class in character_classes %}
+                <p class="mainText">{{caracter_class.game_class.name}}/{{caracter_class.level}} лвл </p>
+                {% endfor %}
+                <p class="mainSub">класс/уровень</p>
+            </div>
+            <div style="width: 25%; float: left; height: 20px; border-bottom: 2px solid black; margin-right: 3px;">
+                <p class="mainText">{{character.race.name}}</p> 
+                <p class="mainSub">раса</p>               
+            </div>
+            <div style="width: 23%; float: right; height: 20px; border-bottom: 2px solid black;">
+                <p class="mainText">{{character.theme.name}}</p> 
+                <p class="mainSub">тема</p>               
+            </div>
+        </div>        
+    </div>
+    </body>
+</html>
