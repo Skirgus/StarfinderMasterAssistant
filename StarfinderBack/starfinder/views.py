@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import Http404
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view, action, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
@@ -16,6 +16,8 @@ from .models import Theme, GameClass, Character, Deity
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
 from .builders import CharacterBuilder
+from .dto import AbilityValueBlankDto
+from .characterManager import CharacterManager
 import json
 
 # Create your views here.
@@ -120,7 +122,9 @@ class CharacterView(viewsets.ViewSet):
         """
         queryset = Character.objects.all()
         character = get_object_or_404(queryset, pk=pk)
-        return render(request, 'character/character_blank.html', {'character': character, 'character_classes': character.gameclasses.all(), 'race': character.race})
+        character_dto = CharacterManager(character).get_blank_dto()       
+
+        return render(request, 'character/character_blank.html', {'character': character_dto})
 
     def retrieve(self, request, pk=None):
         """

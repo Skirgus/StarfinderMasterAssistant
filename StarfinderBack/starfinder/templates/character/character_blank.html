@@ -4,9 +4,10 @@
     </head>
     <style>
         .mainText {           
-            line-height: 0.2;
-            font-size: 12;
+            line-height: 0.4;
+            font-size: 13;
             text-align: center;
+            height: 5px;
         }
         .mainSub {     
             line-height: 0.2;           
@@ -14,36 +15,224 @@
             text-align: center;
             vertical-align: top;
         }
+        .divWithSubString {
+            float: left;
+            height: 50px;
+            margin-right: 3px;
+            padding: 5px;
+        }        
+        .divWithoutSubString {
+            float: left;
+            height: 20px;
+            margin-right: 3px;
+            padding: 5px;
+        }
+        .divStringContainer{
+            margin-top: 5px;
+            clear: left;
+            border: 1px solid black;
+            display: flex;
+        }
+        .abilityValue{            
+            margin-top: 5px;
+            display: flex
+        }
+        .abilityValueTitle{            
+            flex: 1;
+            border-radius: 5px;
+            margin-right: 3px;
+        }
+        .abilityValueItem{            
+            flex: 1;
+            border: 1px solid black;
+            border-radius: 5px;
+            margin-right: 3px;
+        }
+        .abilityContainer{
+            margin-top: 5px;
+            border: 1px solid black;
+            width: 51%;
+        }
+        .delimiter{
+            width: 9.03;
+            margin-right: 5px;
+        }
     </style>
     <body>
     <div>
-            <h2 align="right">Бланк персонажа</h2>
+        <h2 align="right">Бланк персонажа</h2>
     </div>
-    <div style="width: 60%;">
-        <div style="margin-bottom: 10px">
-            <div style="width: 20%; float: left; height: 20px">
-                <span style = "line-height: 1;">Имя персонажа:</span>
+    <div style="display: flex">
+        <div style="flex: 7;">
+            <div class = "divStringContainer">
+                <div class = "divWithoutSubString" style="flex:1;">
+                    <p class="mainText">Имя персонажа:</p>
+                </div>
+                <div class = "divWithoutSubString" style="flex:4;">
+                    <p class="mainText"  style="text-align: left;">{{character.name}}</p>
+                </div>
             </div>
-            <div style="float: left; width: 80%; height: 20px">
-                <span style = "line-height: 1;">{{character.name}}</span>
+            <div class = "divStringContainer">
+                <div class = "divWithSubString" style="flex:2;">
+                    {% for caracter_class in character.character_classes %}
+                    <p class="mainText">{{caracter_class.name}}/{{caracter_class.level}} лвл </p>
+                    {% endfor %}
+                    <hr>
+                    <p class="mainSub">класс/уровень</p>
+                </div>
+                <div class = "divWithSubString" style="flex:1;">
+                    <p class="mainText">{{character.race}}</p> 
+                    <hr>
+                    <p class="mainSub">раса</p>               
+                </div>
+                <div class = "divWithSubString" style="flex:1;">
+                    <p class="mainText">{{character.theme}}</p> 
+                    <hr>
+                    <p class="mainSub">тема</p>               
+                </div>
+            </div>  
+            <div class = "divStringContainer">
+                <div class = "divWithSubString" style="flex:2;">
+                    <p class="mainText"></p>                
+                    <hr>
+                    <p class="mainSub">размер</p>
+                </div>
+                <div class = "divWithSubString" style="flex:2;">
+                    <p class="mainText"></p> 
+                    <hr>
+                    <p class="mainSub">скорость</p>               
+                </div>
+                <div class = "divWithSubString" style="flex:1;">
+                    <p class="mainText"></p> 
+                    <hr>
+                    <p class="mainSub">пол</p>               
+                </div>
+                <div class = "divWithSubString" style="flex:5;">
+                    <p class="mainText"></p> 
+                    <hr>
+                    <p class="mainSub">родной мир</p>               
+                </div>
+            </div> 
+            <div class = "divStringContainer">
+                <div class = "divWithSubString" style="flex:2;">
+                    <p class="mainText">{{character.alignment}}</p>                
+                    <hr>
+                    <p class="mainSub">мировоззрение</p>
+                </div>
+                <div class = "divWithSubString" style="flex:2;">
+                    <p class="mainText">{{character.deity}}</p> 
+                    <hr>
+                    <p class="mainSub">божество</p>               
+                </div>
+                <div class = "divWithSubString" style="flex:4;">
+                    <p class="mainText">{{character.username}}</p> 
+                    <hr>
+                    <p class="mainSub">игрок</p>               
+                </div>
+            </div>      
+        </div>
+        <div style="flex: 3; border: 1px solid black; margin-left: 3px; margin-top: 5px;">
+            <p class="mainText" style = "text-align: left;">Описание</p>
+            <textarea style ="padding:5px; width: 100%; height: 100%">{{character.description}}</textarea>
+        </div>
+    </div>
+    <div class="abilityContainer">
+        <div>
+            <h5>Характеристики</h5>
+        </div>
+        <div class="abilityValue">
+            <div class="abilityValueTitle">            
             </div>
-        <div/>
-        <div style="margin-top: 10px">
-            <div style="width: 50%; float: left; height: 20px; border-bottom: 2px solid black; margin-right: 3px;">
-                {% for caracter_class in character_classes %}
-                <p class="mainText">{{caracter_class.game_class.name}}/{{caracter_class.level}} лвл </p>
-                {% endfor %}
-                <p class="mainSub">класс/уровень</p>
+            <div class="abilityValueTitle">        
+                <p class="mainText">Значение</p>  
             </div>
-            <div style="width: 25%; float: left; height: 20px; border-bottom: 2px solid black; margin-right: 3px;">
-                <p class="mainText">{{character.race.name}}</p> 
-                <p class="mainSub">раса</p>               
+            <div class="abilityValueTitle">
+                <p class="mainText">Модиф.</p>           
             </div>
-            <div style="width: 23%; float: right; height: 20px; border-bottom: 2px solid black;">
-                <p class="mainText">{{character.theme.name}}</p> 
-                <p class="mainSub">тема</p>               
+            <div class="abilityValueTitle"> 
+                <p class="mainText">Временн. значение</p>           
             </div>
-        </div>        
+            <div class="abilityValueTitle">              
+                <p class="mainText">Временн. модиф.</p>           
+            </div>
+        </div>
+        {% for ability_value in character.ability_values %}
+        <div class="abilityValue">
+            <div class="abilityValueItem">  
+                <p class="mainText">{{ability_value.title}}</p>           
+            </div>
+            <div class="abilityValueItem">        
+                <p class="mainText">{{ability_value.value}}</p>  
+            </div>
+            <div class="abilityValueItem">
+                <p class="mainText">{{ability_value.modifier}}</p>           
+            </div>
+            <div class="abilityValueItem"> 
+                <p class="mainText">{{ability_value.temp_value}}</p>           
+            </div>
+            <div class="abilityValueItem">              
+                <p class="mainText">{{ability_value.temp_modifier}}</p>           
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="abilityContainer">
+        <div>
+            <div style="display:flex">
+                <div style="flex:7"><h5>Навыки</h5></div>
+                <div style ="flex:2"><h5>Свободные пункты навыков</h5></div>       
+                <div style ="flex:1;"><h5>{{character.skill_points_pool}}</h5></div>     
+            </div>
+        </div>
+        <div class="abilityValue">
+            <div class="abilityValueTitle" style= "flex:3">            
+            </div>
+            <div class="abilityValueTitle">        
+                <p class="mainText">Всего</p>  
+            </div>
+            <div class = "delimiter"></div>
+            <div class="abilityValueTitle">
+                <p class="mainText">Пункты</p>           
+            </div>
+            <div class = "delimiter"></div>
+            <div class="abilityValueTitle"> 
+                <p class="mainText">Классовый</p>           
+            </div>
+            <div class = "delimiter"></div>
+            <div class="abilityValueTitle">              
+                <p class="mainText">Мод. характ.</p>           
+            </div> 
+            <div class = "delimiter"></div>           
+            <div class="abilityValueTitle">              
+                <p class="mainText">Проч. мод.</p>           
+            </div>
+        </div>
+        {% for skill_value in character.skill_values %}
+        <div class="abilityValue">        
+            <div class="abilityValueItem" style= "flex:3">  
+                <p class="mainText">{{skill_value.title}}</p>           
+            </div>
+            <div class="abilityValueItem">        
+                <p class="mainText">{{skill_value.total}}</p>  
+            </div>
+            <div class= "delimiter">=</div>
+            <div class="abilityValueItem">
+                <p class="mainText">{{skill_value.skill_points}}</p>           
+            </div>
+            <div class= "delimiter">+</div>
+            <div class="abilityValueItem"> 
+                <p class="mainText">{{skill_value.class_points}}</p>           
+            </div>
+            <div class= "delimiter">+</div>
+            <div class="abilityValueItem">              
+                <p class="mainText">{{skill_value.ability_modifier}}</p>           
+            </div>
+            <div class= "delimiter">+</div>
+            <div class="abilityValueItem">              
+                <p class="mainText">{{skill_value.other_modifier}}</p>           
+            </div>
+        </div>
+        {% endfor %}
     </div>
     </body>
 </html>
