@@ -9,6 +9,12 @@
             text-align: center;
             height: 5px;
         }
+        .abilityText {           
+            line-height: 0.2;
+            font-size: 10;
+            text-align: center;
+            height: 3px;
+        }
         .mainSub {     
             line-height: 0.2;           
             font-size: 12;          
@@ -41,12 +47,16 @@
             flex: 1;
             border-radius: 5px;
             margin-right: 3px;
+            margin-top: 2px;
+            height: 15px;
         }
         .abilityValueItem{            
             flex: 1;
             border: 1px solid black;
             border-radius: 5px;
             margin-right: 3px;
+            margin-top: 2px;
+            height: 15px;
         }
         .abilityContainer{
             margin-top: 5px;
@@ -137,7 +147,7 @@
         </div>
     </div>
     <div class="abilityContainer">
-        <div>
+        <div style= "height: 20px">
             <h5>Характеристики</h5>
         </div>
         <div class="abilityValue">
@@ -159,29 +169,29 @@
         {% for ability_value in character.ability_values %}
         <div class="abilityValue">
             <div class="abilityValueItem">  
-                <p class="mainText">{{ability_value.title}}</p>           
+                <p class="abilityText">{{ability_value.title}}</p>           
             </div>
             <div class="abilityValueItem">        
-                <p class="mainText">{{ability_value.value}}</p>  
+                <p class="abilityText">{{ability_value.value}}</p>  
             </div>
             <div class="abilityValueItem">
-                <p class="mainText">{{ability_value.modifier}}</p>           
+                <p class="abilityText">{{ability_value.modifier}}</p>           
             </div>
             <div class="abilityValueItem"> 
-                <p class="mainText">{{ability_value.temp_value}}</p>           
+                <p class="abilityText">{{ability_value.temp_value}}</p>           
             </div>
             <div class="abilityValueItem">              
-                <p class="mainText">{{ability_value.temp_modifier}}</p>           
+                <p class="abilityText">{{ability_value.temp_modifier}}</p>           
             </div>
         </div>
         {% endfor %}
     </div>
     <div class="abilityContainer">
         <div>
-            <div style="display:flex">
+            <div style="display:flex; height: 20px; margin-bottom: 5px">
                 <div style="flex:7"><h5>Навыки</h5></div>
-                <div style ="flex:2"><h5>Свободные пункты навыков</h5></div>       
-                <div style ="flex:1;"><h5>{{character.skill_points_pool}}</h5></div>     
+                <div style ="flex:3"><h6>Свободные пункты навыков</h6></div>       
+                <div style ="flex:1;"><h6>{{character.skill_points_pool}}</h6></div>     
             </div>
         </div>
         <div class="abilityValue">
@@ -210,26 +220,26 @@
         {% for skill_value in character.skill_values %}
         <div class="abilityValue">        
             <div class="abilityValueItem" style= "flex:3">  
-                <p class="mainText">{{skill_value.title}}</p>           
+                <p class="abilityText">{{skill_value.title}}</p>           
             </div>
             <div class="abilityValueItem">        
-                <p class="mainText">{{skill_value.total}}</p>  
+                <p class="abilityText">{{skill_value.total}}</p>  
             </div>
             <div class= "delimiter">=</div>
             <div class="abilityValueItem">
-                <p class="mainText">{{skill_value.skill_points}}</p>           
+                <p class="abilityText">{{skill_value.skill_points}}</p>           
             </div>
             <div class= "delimiter">+</div>
             <div class="abilityValueItem"> 
-                <p class="mainText">{{skill_value.class_points}}</p>           
+                <p class="abilityText">{{skill_value.class_points}}</p>           
             </div>
             <div class= "delimiter">+</div>
             <div class="abilityValueItem">              
-                <p class="mainText">{{skill_value.ability_modifier}}</p>           
+                <p class="abilityText">{{skill_value.ability_modifier}}</p>           
             </div>
             <div class= "delimiter">+</div>
             <div class="abilityValueItem">              
-                <p class="mainText">{{skill_value.other_modifier}}</p>           
+                <p class="abilityText">{{skill_value.other_modifier}}</p>           
             </div>
         </div>
         {% endfor %}
