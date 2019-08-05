@@ -1,6 +1,7 @@
 import django
 from .models import Character, Race, Alignment, Deity, Theme, GameClass
-from .models import AbilityChoice, Skill, World
+from .models import Skill, World
+from .choices import AbilityChoice
 
 
 class CharacterBuilder():    

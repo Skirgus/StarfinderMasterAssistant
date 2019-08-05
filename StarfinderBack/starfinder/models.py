@@ -1,46 +1,10 @@
 from django.db import models
 from django.db.models import Q
-from enum import Enum
 from itertools import chain
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, get_list_or_404
-
-
-class SexChoice(Enum):
-    """Пол"""
-    Male = "Мужской"
-    Femail = "Женский"
-
-    
-class OperationChoice(Enum):
-    """Операция"""
-    Add = "Прибавить"
-    Set = "Установить"
-
-
-class AbilityChoice(Enum):
-    """Характеристика"""
-    STR = "Сила"
-    DEX = "Ловкость"
-    CON = "Выносливость"
-    INT = "Интеллект"
-    WIS = "Мудрость"
-    CHA = "Харизма"
-
-
-class CharacterPropertiesChoice(Enum):
-    """Свойства персонажа"""
-    basic_attack_bonus = "Базовый модификатор атаки"
-    basic_fortitude = "Базовая стойкость"
-    basic_reflex = "Базовая реакция"
-    basic_will = "Базовая воля"
-    hit_points = "Пункты здоровья"
-    stamina_points = "Пункты живучести"
-    resolve_points = "Пункты решимости"
-    ability_pool = "Очки характеристик доступные для распределения"
-    skill_points_pool = "Очки навыков доступные для распределения"
-
+from .choices import AbilityChoice, SexChoice, OperationChoice, CharacterPropertiesChoice
 
 # Create your models here.
 class Race(models.Model):
@@ -358,6 +322,7 @@ class CharacterSkillValue(models.Model):
     skill_learned = models.BooleanField() # признак изученности навыка
     additional_info = models.CharField(max_length =255, null=True, blank=True) # дополнительная информация (например указание конкретной профессии)
     skill_points = models.IntegerField() # пункты вложенные в навык
+    class_skill = models.BooleanField(default=False) # признак классового навыка
 
 
 class AbilityValue(models.Model):
