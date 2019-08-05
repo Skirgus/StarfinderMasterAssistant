@@ -40,7 +40,7 @@
             display: flex;
         }
         .abilityValue{            
-            margin-top: 5px;
+            margin-top: 3px;
             display: flex
         }
         .abilityValueTitle{            
@@ -55,13 +55,21 @@
             border: 1px solid black;
             border-radius: 5px;
             margin-right: 3px;
-            margin-top: 2px;
+            margin-top: 3px;
             height: 15px;
         }
-        .abilityContainer{
+        .leftContainer{
             margin-top: 5px;
             border: 1px solid black;
+            float: left;
             width: 51%;
+        }
+        .rightContainer{
+            margin-top: 5px;
+            margin-left: 5px;
+            border: 1px solid black;
+            width: 47%;
+            float: right;
         }
         .delimiter{
             width: 9.03;
@@ -146,9 +154,9 @@
             <textarea style ="padding:5px; width: 100%; height: 100%">{{character.description}}</textarea>
         </div>
     </div>
-    <div class="abilityContainer">
+    <div class="leftContainer">
         <div style= "height: 20px">
-            <h5>Характеристики</h5>
+            <b>Характеристики</b>
         </div>
         <div class="abilityValue">
             <div class="abilityValueTitle">            
@@ -186,12 +194,74 @@
         </div>
         {% endfor %}
     </div>
-    <div class="abilityContainer">
+    <div class="rightContainer">
+        <div style="display:flex; height: 20px; margin-bottom: 5px">
+            <div style="flex:3"><b>Инициатива</b></div>
+            <div class="abilityValueItem">        
+                <p class="abilityText">{{character.total_initiative}}</p>  
+            </div>
+            <div class= "delimiter">=</div>
+            <div class="abilityValueItem">
+                <p class="abilityText">{{character.dex_modifier}}</p>           
+            </div>
+            <div class= "delimiter">+</div>
+            <div class="abilityValueItem"> 
+                <p class="abilityText">{{character.initiative_modifiers}}</p>           
+            </div>
+        </div>
+    </div>
+    <div class="rightContainer">
+        <div style="display:flex; height: 20px; margin-bottom: 5px">
+            <div style="flex:3"><b>Здоровье и решимость</b></div>
+        </div>
+        <div class="abilityValue">
+            <div class="abilityValueTitle">            
+            </div>
+            <div class="abilityValueTitle">        
+                <p class="mainText">Пункты живучести</p>  
+            </div>
+            <div class="abilityValueTitle">
+                <p class="mainText">Пункты здоровья</p>           
+            </div>
+            <div class="abilityValueTitle"> 
+                <p class="mainText">Пункты решимости</p>           
+            </div>
+        </div>
+        <div class="abilityValue">
+            <div class="abilityValueItem">  
+                <p class="abilityText">Всего</p>           
+            </div>
+            <div class="abilityValueItem">        
+                <p class="abilityText">{{character.stamina_points}}</p>  
+            </div>
+            <div class="abilityValueItem">
+                <p class="abilityText">{{character.hit_points}}</p>           
+            </div>
+            <div class="abilityValueItem"> 
+                <p class="abilityText">{{character.resolve_points}}</p>           
+            </div>
+        </div>
+        <div class="abilityValue">
+            <div class="abilityValueItem">  
+                <p class="abilityText">Текущие</p>           
+            </div>
+            <div class="abilityValueItem">        
+                <p class="abilityText"> </p>  
+            </div>
+            <div class="abilityValueItem">
+                <p class="abilityText"> </p>           
+            </div>
+            <div class="abilityValueItem"> 
+                <p class="abilityText"> </p>           
+            </div>
+        </div>
+    </div>
+    <div class="leftContainer">
         <div>
             <div style="display:flex; height: 20px; margin-bottom: 5px">
-                <div style="flex:7"><h5>Навыки</h5></div>
-                <div style ="flex:3"><h6>Свободные пункты навыков</h6></div>       
-                <div style ="flex:1;"><h6>{{character.skill_points_pool}}</h6></div>     
+                <div style="flex:7"><b>Навыки</b></div>
+                <div style ="flex:3"><b>Свободные пункты навыков</b></div>       
+                <div style ="flex:1;"><b>{{character.skill_points_pool}}</b></div>     
             </div>
         </div>
         <div class="abilityValue">
@@ -243,6 +313,6 @@
             </div>
         </div>
         {% endfor %}
-    </div>
+    </div>    
     </body>
 </html>

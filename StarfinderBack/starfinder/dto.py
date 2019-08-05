@@ -70,6 +70,7 @@ class CharacterBlankDto:
         self.resolve_points = character.resolve_points # пункты решимости 
         self.initiative_modifiers = initiative_modifiers # прочие модификаторы инициативы
         self.total_initiative = character.get_ability(AbilityChoice.DEX.name).get_modifier() + self.initiative_modifiers #инициатива
+        self.dex_modifier = character.get_ability(AbilityChoice.DEX.name).get_modifier() # модификатор ловкости
         self.character_classes = character_classes #классы персонажа
         self.ability_values = ability_values #характеристики
         self.skill_values = skill_values #навыки
