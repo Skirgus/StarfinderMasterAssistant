@@ -2,6 +2,9 @@ from django.db import models
 from django.db.models import Q
 from enum import Enum
 from itertools import chain
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 class SexChoice(Enum):
@@ -175,6 +178,9 @@ class Skill(models.Model):
     armor_penalty_applies = models.BooleanField(default=False) # применяется штраф на броню
     description = models.TextField() # описание
     need_additional_info = models.BooleanField(default=False) # необходима дополнительная информация
+    
+    def __str__(self):
+        return self.name 
 
 
 class Character(models.Model): 
@@ -183,13 +189,16 @@ class Character(models.Model):
     name = models.CharField(max_length=255, unique=True) # имя персонажа
     portrait = models.ImageField(upload_to='character_portraits/', null=True, blank=True) # портрет персонажа
     gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
-    description = models.TextField() # описание
+    description = models.TextField(null=True, blank=True) # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
+    distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки (это поле надо явно менять на клиенте, 
+    # только так будет уверенность что очко вложенной в навык вложенно пользователем из пула очков навыков) на основе него можно будет рассчитать,
+    # сколько очков надо добавить при изменении интеллекта
     level = models.IntegerField() # уровень
     basic_attack_bonus = models.IntegerField(default=0) # базовый модификатор атаки
     basic_fortitude = models.IntegerField(default=0) # базовая стойкость
@@ -246,7 +255,7 @@ class Character(models.Model):
 
     def set_ability_value(self, ability, value):
         """Задать значение характеристики"""
-        ability_value = self.self.get_ability(ability)
+        ability_value = self.get_ability(ability)
         ability_value.value = value
         ability_value.save()        
 
@@ -261,6 +270,38 @@ class Character(models.Model):
         character_skill = self.skillvalues.get(skill=skill)
         character_skill.skill_points = value
         character_skill.save()      
+ 
+    def add_distributed_skill_points(self, value):        
+            self.distributed_skill_points += value
+
+    def on_change_ability_value(self, ability_value):
+        if ability_value.ability == AbilityChoice.CON.name:
+            self.on_change_ability_constitution(ability_value)
+        elif ability_value.ability == AbilityChoice.INT.name:
+            self.on_change_ability_intelligence(ability_value)
+    
+    def on_change_ability_constitution(self, ability_value):
+        modifier = ability_value.get_modifier()
+        calculated_stamina_points = 0
+        for char_game_class in self.gameclasses.all():
+            calculated_stamina_points += (char_game_class.game_class.stamina_point_on_level + modifier) * char_game_class.level
+
+        if self.stamina_points != calculated_stamina_points:
+            self.stamina_points = calculated_stamina_points
+            self.save()   
+
+    def on_change_ability_intelligence(self, ability_value):
+        modifier = ability_value.get_modifier()
+        calculated_int_points = 0
+        for char_game_class in self.gameclasses.all():
+            calculated_int_points += (char_game_class.game_class.skill_point_on_level + modifier) * char_game_class.level
+
+        # считаем сколько должно быть на уровне очков навыков вычитаем оттуда очки навыков в пуле навыков и распределенные очки навыков
+        diff = calculated_int_points - self.skill_points_pool - self.distributed_skill_points 
+
+        if diff != 0:
+            self.skill_points_pool += diff
+            self.save()
 
 
 class CharacterGameClass(models.Model):  
@@ -279,8 +320,8 @@ class CharacterSkillValue(models.Model):
     character = models.ForeignKey('Character',  related_name='skillvalues', on_delete=models.CASCADE) # персонаж
     skill = models.ForeignKey('Skill', on_delete=models.PROTECT) # навык
     skill_learned = models.BooleanField() # признак изученности навыка
-    additional_info = models.CharField(max_length =255) # дополнительная информация (например указание конкретной профессии)
-    skill_points = models.IntegerField() # пункты вложенные в навыкs
+    additional_info = models.CharField(max_length =255, null=True, blank=True) # дополнительная информация (например указание конкретной профессии)
+    skill_points = models.IntegerField() # пункты вложенные в навык
 
 
 class AbilityValue(models.Model):
@@ -350,3 +391,10 @@ class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
 
     def __str__(self):
         return self.game_class.name + ' (' + self.name+ ')'
+
+#todo надо вынести в отдельный файл, но есть проблемы с импортом, хз почему
+@receiver(post_save, sender=AbilityValue)
+def ability_value_post_save(sender, instance, **kwargs):
+    """Обработка сигнала изменения характеристики"""
+    if not kwargs['created']:
+        instance.character.on_change_ability_value(instance)
