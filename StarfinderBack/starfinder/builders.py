@@ -1,6 +1,6 @@
 import django
 from .models import Character, Race, Alignment, Deity, Theme, GameClass
-from .models import AbilityChoice, Skill
+from .models import AbilityChoice, Skill, World
 
 
 class CharacterBuilder():    
@@ -20,10 +20,10 @@ class CharacterBuilder():
     def reset(self) -> None:
         self._character = Character()
 
-    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender, user) -> Character:  
+    def character(self, name, race_id, theme_id, alignment_id, deity_id, class_id, gender, user, world_id) -> Character:  
         try:      
             character = self._character
-            self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id, user)
+            self.set_base_fields(name, alignment_id, deity_id, gender, race_id, theme_id, user, world_id)
             self.set_class(class_id)
             self.create_character_abilities()
             self.create_character_skills()
@@ -36,7 +36,7 @@ class CharacterBuilder():
                 character.delete()
             raise Exception            
 
-    def set_base_fields(self, name, alignment_id, deity_id, gender, race_id, theme_id, user):
+    def set_base_fields(self, name, alignment_id, deity_id, gender, race_id, theme_id, user, world_id):
         character = self._character
         character.name = name
         character.gender = gender
@@ -47,6 +47,8 @@ class CharacterBuilder():
         character.level = 1
         if deity_id is not None:
             character.deity = Deity.objects.get(id=deity_id)
+        if world_id is not None:
+            character.home_world = World.objects.get(id=world_id)
         character.user = user
         character.save()
     
