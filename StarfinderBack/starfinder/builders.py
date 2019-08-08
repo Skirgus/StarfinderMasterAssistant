@@ -30,6 +30,7 @@ class CharacterBuilder():
             self.set_class(class_id)
             self.create_character_abilities()
             self.create_character_skills()
+            self.set_class_skills(class_id)
 
             character.go_to_level(1, class_id)
             self.reset()
@@ -53,7 +54,10 @@ class CharacterBuilder():
         if world_id is not None:
             character.home_world = World.objects.get(id=world_id)
         if subrace_id is not None:
-            character.subrace = Subrace.objects.get(id=subrace_id)
+            subrace = Subrace.objects.get(id=subrace_id)
+            if subrace.race != character.race:
+                raise ValueError("Под раса персонажа должна принадлежать расе персонажа")
+            character.subrace = subrace
         character.user = user
         character.save()
     
@@ -76,10 +80,10 @@ class CharacterBuilder():
 
     def set_class_skills(self, class_id):
         character = self._character
-        theme_rules = self.theme.set_class_skill_rules
+        theme_rules = character.theme.set_class_skill_rules.all()
 
-        character_game_class = self.gameclasses.get(game_class_id = class_id)
-        class_rules = character_game_class.game_class.set_class_skill_rules
+        character_game_class = character.gameclasses.get(game_class_id = class_id)
+        class_rules = character_game_class.game_class.set_class_skill_rules.all()
                 
         rules = list(chain(theme_rules, class_rules)) 
 

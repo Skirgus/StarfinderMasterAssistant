@@ -36,10 +36,10 @@ class World(models.Model):
     AIR_CHOISE = (
         (NONE, 'Отсутствует'),
         (THIN, 'Разряжённая'),
-        (NORMAL, 'Обычная')
-        (SPECIAL, 'Особая')
-        (TOXIC_AND_THIN, 'Токсичная и разряжённая')
-        (NORMAL_OR_NONE, 'Обычная или отсутствует')
+        (NORMAL, 'Обычная'),
+        (SPECIAL, 'Особая'),
+        (TOXIC_AND_THIN, 'Токсичная и разряжённая'),
+        (NORMAL_OR_NONE, 'Обычная или отсутствует'),
         (TOXIC, 'Токсичная')
     )
 

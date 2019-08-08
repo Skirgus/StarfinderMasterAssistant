@@ -49,7 +49,7 @@ class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     def __str__(self):
         return self.game_class.name + ' (' + self.name+ ')'
 
-class RaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
+class SubRaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила подрасы действующие при повышении в уровне"""
     subrace = models.ForeignKey('Subrace',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # подраса
     
@@ -75,4 +75,4 @@ class ClassSkills(SetClassSkill):
     game_class = models.ForeignKey('GameClass',  related_name='set_class_skill_rules', on_delete=models.CASCADE) # класс
 
     def __str__(self):
-        return self.game_class.name + ' (' + self.name + ')'
+        return self.game_class.name + ' (' + self.skill.name + ')'
