@@ -14,6 +14,7 @@ urlpatterns = [
     path('characters/', CharacterView.as_view({'get': 'list'})),
     path('characters/<int:pk>', CharacterView.as_view({'get': 'retrieve'})),
     path('characters/', CharacterView.as_view({'post': 'post'})),
-    path('characters/<int:pk>', CharacterView.as_view({'put': 'put'})),
+    path('characters/<int:pk>', CharacterView.as_view({'put': 'put'})),    
+    path('characters/<int:pk>/character_blank', CharacterView.as_view({'get': 'character_blank'})),
     path('login/', login)    
 ]
