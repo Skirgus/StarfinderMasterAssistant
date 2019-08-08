@@ -37,12 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'starfinder.choices',
     'rest_framework',
     'rest_framework.authtoken',
-    'starfinder',
-    'starfinder.dto',
-    'starfinder.characterManager',
+    'starfinder'
 ]
 
 MIDDLEWARE = [

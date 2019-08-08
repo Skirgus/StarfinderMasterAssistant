@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class SexChoice(Enum):
     """Пол"""
     Male = "Мужской"

@@ -1,4 +1,6 @@
 import django
+from django.db.models import Q
+from itertools import chain
 from .models import Character, Race, Alignment, Deity, Theme, GameClass
 from .models import Skill
 from .choices import AbilityChoice
@@ -67,3 +69,21 @@ class CharacterBuilder():
         skill_array = Skill.objects.all()
         for skill in skill_array:
             character.skillvalues.create(skill=skill, skill_learned=False, skill_points=0)
+
+    def set_class_skills(self, class_id):
+        character = self._character
+        theme_rules = self.theme.set_class_skill_rules
+
+        character_game_class = self.gameclasses.get(game_class_id = class_id)
+        class_rules = character_game_class.game_class.set_class_skill_rules
+                
+        rules = list(chain(theme_rules, class_rules)) 
+
+        for rule in rules:
+            rule_skill = rule.skill
+            character_skill = character.skillvalues.get(skill=rule_skill)
+            if character_skill.class_skill:
+                character_skill.skill_points += 1
+            else: 
+                character_skill.class_skill = True
+            character_skill.save()

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Alignment, Deity, Theme, GameClass, Skill
-from .models import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp
+from .ruleModels import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp
 
 # Register your models here.
 
