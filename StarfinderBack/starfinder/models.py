@@ -190,7 +190,7 @@ class Character(models.Model):
     gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
     description = models.TextField(null=True, blank=True) # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
-    subrace = models.ForeignKey('Subrace',  related_name='characters', on_delete=models.CASCADE) #под раса
+    subrace = models.ForeignKey('Subrace', null=True, blank=True, on_delete=models.SET_NULL) #под раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
@@ -220,9 +220,8 @@ class Character(models.Model):
         theme_rules = self.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         subrace_rules = self.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         character_game_class = self.gameclasses.get(game_class_id = class_id)
-
         class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        
+
         rules = list(chain(race_rules, theme_rules, class_rules, subrace_rules))        
 
         for rule in rules:
