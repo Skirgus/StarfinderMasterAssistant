@@ -24,6 +24,41 @@ class Race(models.Model):
         return self.name
 
 
+class World(models.Model):
+    """Мир"""
+    NONE = 0
+    THIN = 1
+    NORMAL = 2
+    SPECIAL = 3
+    TOXIC_AND_THIN = 4
+    NORMAL_OR_NONE = 5
+    TOXIC = 6
+    AIR_CHOISE = (
+        (NONE, 'Отсутствует'),
+        (THIN, 'Разряжённая'),
+        (NORMAL, 'Обычная')
+        (SPECIAL, 'Особая')
+        (TOXIC_AND_THIN, 'Токсичная и разряжённая')
+        (NORMAL_OR_NONE, 'Обычная или отсутствует')
+        (TOXIC, 'Токсичная')
+    )
+
+    name = models.CharField(max_length=255) # наименование планеты
+    byname = models.CharField(max_length=255, null=True, blank=True) # прозвание планеты
+    diam = models.CharField(max_length=255) # диаметр планеты
+    weight = models.CharField(max_length=255) # масса 
+    gravity = models.CharField(max_length=255) # гравитация
+    air = models.IntegerField(choices=AIR_CHOISE, default=NORMAL) # атмосфера
+    day = models.CharField(max_length=255, null=True, blank=True) # день
+    year = models.CharField(max_length=255, null=True, blank=True) # год
+    described = models.TextField() # описание планеты
+    planet_image = models.ImageField(upload_to='world/', null=True, blank=True) # изображение планеты
+    panoramic_image = models.ImageField(upload_to='world/', null=True, blank=True) # панорама пейзажа
+
+    def __str__(self):
+        return self.name
+
+
 class Alignment(models.Model):
     """Мировозрение"""
     class Meta:
@@ -159,6 +194,7 @@ class Character(models.Model):
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
+    home_world = models.ForeignKey('World', null=True, blank=True, on_delete=models.SET_NULL) # родной мир
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
     distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки (это поле надо явно менять на клиенте, 
