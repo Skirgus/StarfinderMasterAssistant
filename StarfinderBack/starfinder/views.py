@@ -152,6 +152,8 @@ class CharacterView(viewsets.ViewSet):
         if alignment_id is None:
             raise ValueError("Не задано мировоззрение")
         deity_id = request.data['deity_id']
+        world_id = request.data['world_id']
+        subrace_id = request.data['subrace_id']
         class_id = request.data['class_id']
         if class_id is None:
             raise ValueError("Не задан класс")
@@ -159,7 +161,7 @@ class CharacterView(viewsets.ViewSet):
         user = request.user
         builder = CharacterBuilder()
         character = builder.character(name, race_id, theme_id, alignment_id,
-                     deity_id, class_id, gender, user)
+                     deity_id, class_id, gender, user, world_id, subrace_id)
         serializer = CharacterSerializer(character)        
         return Response(serializer.data)
 

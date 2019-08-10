@@ -24,6 +24,41 @@ class Race(models.Model):
         return self.name
 
 
+class World(models.Model):
+    """Мир"""
+    NONE = 0
+    THIN = 1
+    NORMAL = 2
+    SPECIAL = 3
+    TOXIC_AND_THIN = 4
+    NORMAL_OR_NONE = 5
+    TOXIC = 6
+    AIR_CHOISE = (
+        (NONE, 'Отсутствует'),
+        (THIN, 'Разряжённая'),
+        (NORMAL, 'Обычная'),
+        (SPECIAL, 'Особая'),
+        (TOXIC_AND_THIN, 'Токсичная и разряжённая'),
+        (NORMAL_OR_NONE, 'Обычная или отсутствует'),
+        (TOXIC, 'Токсичная')
+    )
+
+    name = models.CharField(max_length=255) # наименование планеты
+    byname = models.CharField(max_length=255, null=True, blank=True) # прозвание планеты
+    diam = models.CharField(max_length=255) # диаметр планеты
+    weight = models.CharField(max_length=255) # масса 
+    gravity = models.CharField(max_length=255) # гравитация
+    air = models.IntegerField(choices=AIR_CHOISE, default=NORMAL) # атмосфера
+    day = models.CharField(max_length=255, null=True, blank=True) # день
+    year = models.CharField(max_length=255, null=True, blank=True) # год
+    described = models.TextField() # описание планеты
+    planet_image = models.ImageField(upload_to='world/', null=True, blank=True) # изображение планеты
+    panoramic_image = models.ImageField(upload_to='world/', null=True, blank=True) # панорама пейзажа
+
+    def __str__(self):
+        return self.name
+
+
 class Alignment(models.Model):
     """Мировозрение"""
     class Meta:
@@ -155,9 +190,11 @@ class Character(models.Model):
     gender = models.CharField(max_length=5, choices=[(tag.name, tag.value) for tag in SexChoice])  # пол
     description = models.TextField(null=True, blank=True) # описание
     race = models.ForeignKey('Race',  related_name='characters', on_delete=models.CASCADE) # раса
+    subrace = models.ForeignKey('Subrace', null=True, blank=True, on_delete=models.SET_NULL) #под раса
     theme = models.ForeignKey('Theme',  related_name='characters', on_delete=models.CASCADE) # тема
     alignment = models.ForeignKey('Alignment', on_delete=models.PROTECT) # мировозрение
     deity = models.ForeignKey('Deity', null=True, blank=True, on_delete=models.SET_NULL) # божество
+    home_world = models.ForeignKey('World', null=True, blank=True, on_delete=models.SET_NULL) # родной мир
     ability_pool = models.IntegerField(default=0) # очки характеристик доступные для распределения
     skill_points_pool = models.IntegerField(default=0) # очки навыков доступные для распределения
     distributed_skill_points = models.IntegerField(default=0) # очки навыков вложенные в навыки (это поле надо явно менять на клиенте, 
@@ -181,12 +218,11 @@ class Character(models.Model):
         """Обработка перехода на указанный уровень"""
         race_rules = self.race.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         theme_rules = self.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        
+        subrace_rules = self.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         character_game_class = self.gameclasses.get(game_class_id = class_id)
-
         class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
 
-        rules = list(chain(race_rules, theme_rules, class_rules))
+        rules = list(chain(race_rules, theme_rules, class_rules, subrace_rules))        
 
         for rule in rules:
             if rule.operation == OperationChoice.Add.name:
@@ -306,60 +342,3 @@ class AbilityValue(models.Model):
 
     def get_temp_modifier(self):
         return self.temp_value//2 - 5
-
-
-class BaseRule(models.Model):
-    """Базовый класс для правил"""
-    class Meta:
-        abstract = True
-    name = models.CharField(max_length=255, null=True, blank=True) # название правила
-    description = models.TextField(null=True, blank=True) # описание правила
-
-
-class RulesActingOnCharLevelUp(BaseRule):
-    """Базовый класс для правил действующих на персонажа при повышении уровня"""
-    class Meta:
-        abstract = True
-    level = models.IntegerField() # уровень при достижении которого срабатывает правило
-    ability = models.CharField(max_length=255, 
-                            choices=[(tag.name, tag.value) 
-                            for tag in AbilityChoice], null=True, blank=True)  # характеристика
-    skill = models.ForeignKey('Skill', on_delete=models.PROTECT, null=True, blank=True) # навык
-    character_property = models.CharField(max_length=255, 
-                            choices=[(tag.name, tag.value) 
-                            for tag in CharacterPropertiesChoice], null=True, blank=True)  # свойство персонажа  
-    change_to = models.IntegerField() # значение на которое изменяется параметр
-    operation = models.CharField(max_length=255, 
-                            choices=[(tag.name, tag.value) 
-                            for tag in OperationChoice], null=True, blank=True)  # операция
-
-
-class RaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
-    """Правила расы действующие при повышении в уровне"""
-    race = models.ForeignKey('Race',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # раса
-    
-    def __str__(self):
-        return self.race.name + ' (' + self.name+ ')'
-
-    
-class ThemeRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
-    """Правила темы действующие при повышении в уровне"""
-    theme = models.ForeignKey('Theme',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
-    
-    def __str__(self):
-        return self.theme.name + ' (' + self.name+ ')'
-    
-    
-class ClassRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
-    """Правила класса действующие при повышении в уровне"""
-    game_class = models.ForeignKey('GameClass',  related_name='rulesactingoncharlevelup', on_delete=models.CASCADE) # тема
-
-    def __str__(self):
-        return self.game_class.name + ' (' + self.name+ ')'
-
-#todo надо вынести в отдельный файл, но есть проблемы с импортом, хз почему
-@receiver(post_save, sender=AbilityValue)
-def ability_value_post_save(sender, instance, **kwargs):
-    """Обработка сигнала изменения характеристики"""
-    if not kwargs['created']:
-        instance.character.on_change_ability_value(instance)

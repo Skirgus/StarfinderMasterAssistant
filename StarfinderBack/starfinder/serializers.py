@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
-from .models import Character, Deity
+from .models import Character, Deity, World
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -92,6 +92,12 @@ class DeitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WorldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = World
+        fields = 'name'
+
+
 class AbilityValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = AbilityValue
@@ -116,10 +122,11 @@ class CharacterSerializer(serializers.ModelSerializer):
     skillvalues = CharacterSkillValueSerializer(many=True, read_only=False)
     gameclasses = CharacterGameClassSerializer(many=True, read_only=False)
     race = CharacterRaceSerializer(many=False, read_only = False)
-    theme = CharacterThemeSerilizer(many=False, read_only = False)    
+    theme = CharacterThemeSerilizer(many=False, read_only = False) 
+    home_world = WorldSerializer(many=False, read_only=False)   
     class Meta:
         model = Character
-        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'ability_pool',
+        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'home_world', 'ability_pool',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
             'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points')
 
