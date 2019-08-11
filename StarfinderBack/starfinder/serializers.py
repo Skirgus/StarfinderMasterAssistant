@@ -91,11 +91,15 @@ class DeitySerializer(serializers.ModelSerializer):
         model = Deity
         fields = '__all__'
 
+class WorldListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = World
+        fields = ('id', 'name', 'planet_image')
 
 class WorldSerializer(serializers.ModelSerializer):
     class Meta:
         model = World
-        fields = 'name'
+        fields = '__all__'
 
 
 class AbilityValueSerializer(serializers.ModelSerializer):
