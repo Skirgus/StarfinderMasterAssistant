@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
-from .models import Alignment, Deity, Theme, GameClass, Skill, World
+from .models import Alignment, Deity, Theme, GameClass, Skill, World, Language
 from .ruleModels import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp,SubRaceRulesActingOnCharLevelUp
 from .ruleModels import ThemeClassSkills, ClassSkills
 
@@ -9,6 +9,7 @@ from .ruleModels import ThemeClassSkills, ClassSkills
 admin.site.register(Race)
 admin.site.register(RaceDescription)
 admin.site.register(RacePlayingFor)
+admin.site.register(Language)
 admin.site.register(Subrace)
 admin.site.register(Alignment)
 admin.site.register(Deity)

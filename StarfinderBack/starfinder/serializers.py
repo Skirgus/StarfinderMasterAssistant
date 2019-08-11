@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
-from .models import Character, Deity, World
+from .models import Character, Deity, World, Language
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -31,10 +31,11 @@ class RaceSerializer(serializers.ModelSerializer):
     descriptions = RaceDescriptionSerializer(many=True, read_only=True)
     playingforinformations = RacePlayingForSerializer(many=True, read_only=True)
     subraces = SubraceSerializer(many=True, read_only=True)
+    language = serializers.CharField(read_only=True, source="language.name")
     class Meta:
         model = Race
         fields = ('id', 'name', 'basic_info', 'basic_image', 'min_average_weight', 'max_average_weight',
-         'min_average_height', 'max_average_height', 'age_of_majority', 'descriptions', 'playingforinformations', 'subraces')
+         'min_average_height', 'max_average_height', 'age_of_majority', 'descriptions', 'playingforinformations', 'subraces', 'language')
 
 
 class CharacterRaceSerializer(serializers.ModelSerializer):    
@@ -97,10 +98,15 @@ class WorldListSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'planet_image')
 
 class WorldSerializer(serializers.ModelSerializer):
+    language = serializers.CharField(read_only=True, source="language.name")
     class Meta:
         model = World
         fields = '__all__'
 
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = ('id', 'name')
 
 class AbilityValueSerializer(serializers.ModelSerializer):
     class Meta:

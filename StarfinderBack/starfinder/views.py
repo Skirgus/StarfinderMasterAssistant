@@ -12,8 +12,8 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass, Character, Deity, World
-from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer
+from .models import Theme, GameClass, Character, Deity, World, Language
+from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer, LanguageSerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
 from .serializers import WorldSerializer, WorldListSerializer
 from .builders import CharacterBuilder
@@ -102,6 +102,25 @@ class DeityView(viewsets.ViewSet):
         serializer = DeitySerializer(deity)        
         return Response(serializer.data)
 
+class LanguageView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка языков
+        """
+        language = Language.objects.all()                
+        serializer = LanguageSerializer(language, many=True)
+        return Response({"Languages": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение языка по идентификатору
+
+        pk - идентификатор языка
+        """
+        queryset = Language.objects.all()
+        language = get_object_or_404(queryset, pk=pk)
+        serializer = LanguageSerializer(language)        
+        return Response(serializer.data)
         
 class GameClassView(viewsets.ViewSet):
     def list(self, request):
