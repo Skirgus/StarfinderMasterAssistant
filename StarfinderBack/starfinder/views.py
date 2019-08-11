@@ -12,9 +12,10 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass, Character, Deity
+from .models import Theme, GameClass, Character, Deity, World
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
+from .serializers import WorldSerializer, WorldListSerializer
 from .builders import CharacterBuilder
 from .dto import AbilityValueBlankDto
 from .characterManager import CharacterManager
@@ -42,6 +43,24 @@ class RacesView(viewsets.ViewSet):
         serializer = RaceSerializer(race)        
         return Response(serializer.data)
 
+class WorldsView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка миров
+        """
+        worlds = World.objects.all()
+        serializer = WorldListSerializer(worlds, many=True)
+        return Response({"worlds": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение мира по идентификатору
+        pk = идентификатор мира
+        """
+        queryset = World.objects.all()
+        world = get_object_or_404(queryset, pk=pk)
+        serializer = WorldSerializer(world)
+        return Response(serializer.data)
 
 class ThemeView(viewsets.ViewSet):
     def list(self, request):

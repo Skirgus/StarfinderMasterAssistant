@@ -57,6 +57,7 @@ class CharacterBlankDto:
         self.description = character.description # описание
         self.race = character.race.name # раса
         self.theme = character.theme.name # тема
+        self.home_world = character.home_world.name if character.home_world is not None else ''# родной мир
         self.alignment = character.alignment.name # мировозрение
         self.deity = character.deity.name if character.deity is not None else '' # божество
         self.skill_points_pool = character.skill_points_pool # очки навыков доступные для распределения

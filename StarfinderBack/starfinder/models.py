@@ -218,7 +218,9 @@ class Character(models.Model):
         """Обработка перехода на указанный уровень"""
         race_rules = self.race.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         theme_rules = self.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        subrace_rules = self.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        subrace_rules = []
+        if self.subrace is not None:
+            subrace_rules = self.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
         character_game_class = self.gameclasses.get(game_class_id = class_id)
         class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
 
