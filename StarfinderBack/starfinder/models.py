@@ -16,10 +16,19 @@ class Race(models.Model):
     max_average_height = models.DecimalField(max_digits=5, decimal_places=2) # средний рост, нижняя граница
     age_of_majority = models.IntegerField() # возраст совершеннолетия
     basic_info = models.TextField() # базовая информация
+    language = models.ForeignKey('Language', on_delete=models.PROTECT, null=True, blank=True) # язык
     title_info = models.TextField() # информация для списка
     basic_image = models.ImageField(upload_to='races/', null=True, blank=True) # изображение
     title_image = models.ImageField(upload_to='races/', null=True, blank=True) # миниатюра для списка
     
+    def __str__(self):
+        return self.name
+
+
+class Language(models.Model):
+    """Язык"""
+    name = models.CharField(max_length=255) # название языка
+
     def __str__(self):
         return self.name
 
@@ -54,6 +63,7 @@ class World(models.Model):
     described = models.TextField() # описание планеты
     planet_image = models.ImageField(upload_to='world/', null=True, blank=True) # изображение планеты
     panoramic_image = models.ImageField(upload_to='world/', null=True, blank=True) # панорама пейзажа
+    language = models.ForeignKey('Language', on_delete=models.PROTECT, null=True, blank=True) # язык
 
     def __str__(self):
         return self.name
@@ -208,6 +218,7 @@ class Character(models.Model):
     hit_points = models.IntegerField(default=0) # пункты здоровья
     stamina_points = models.IntegerField(default=0) # пункты живучести
     resolve_points = models.IntegerField(default=0) # пункты решимости 
+    languages = models.ManyToManyField(Language) # языки персонажа
 
     def get_ability(self, tag):
         """Получение характеристики персонажа"""
