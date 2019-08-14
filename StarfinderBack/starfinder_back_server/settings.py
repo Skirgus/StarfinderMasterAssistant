@@ -25,7 +25,10 @@ SECRET_KEY = 'ce4vh2uz8r$r9ulx9sbdau1jx$$_p%l)^u9v4aca*m551&ynj&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['skirs.pythonanywhere.com']
+ALLOWED_HOSTS = [
+    'skirs.pythonanywhere.com',
+    '127.0.0.1:8000',
+    '127.0.0.1']
 
 
 # Application definition
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_yasg',
     'starfinder'
 ]
 
@@ -108,6 +112,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+SWAGGER_SETTINGS = {
+        'SECURITY_DEFINITIONS' : {
+            'DRF Token' : {
+                'type' : 'apiKey' ,
+                'name' : 'Authorization' ,
+                'in' : 'header'
+            }
+        }
+    }
 
 
 # Internationalization
