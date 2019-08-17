@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'skirs.pythonanywhere.com',
     '127.0.0.1:8000',
-    '127.0.0.1']
+    '127.0.0.1',
+    'localhost']
 
 
 # Application definition
@@ -81,7 +82,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', )
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ]
 }
 
 # Database
