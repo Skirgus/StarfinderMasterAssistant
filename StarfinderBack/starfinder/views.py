@@ -15,10 +15,11 @@ from .models import Race, RaceDescription, RacePlayingFor
 from .models import Theme, GameClass, Character, Deity, World, Language
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer, LanguageSerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
-from .serializers import WorldSerializer, WorldListSerializer
+from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer
 from .builders import CharacterBuilder
 from .dto import AbilityValueBlankDto
 from .characterManager import CharacterManager
+from .equipment import Weapon
 import json
 
 # Create your views here.
@@ -41,6 +42,26 @@ class RacesView(viewsets.ViewSet):
         queryset = Race.objects.all()
         race = get_object_or_404(queryset, pk=pk)
         serializer = RaceSerializer(race)        
+        return Response(serializer.data)
+
+class WeaponView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка оружия
+        """
+        weapon = Weapon.objects.all()                
+        serializer = WeaponSerializer(weapon, many=True)
+        return Response({"Weapons": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение оружия по идентификатору
+
+        pk - идентификатор оружия
+        """
+        queryset = Weapon.objects.all()
+        weapon = get_object_or_404(queryset, pk=pk)
+        serializer = WeaponSerializer(weapon)        
         return Response(serializer.data)
 
 class WorldsView(viewsets.ViewSet):

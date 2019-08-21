@@ -33,3 +33,20 @@ class CharacterPropertiesChoice(Enum):
     resolve_points = "Пункты решимости"
     ability_pool = "Очки характеристик доступные для распределения"
     skill_points_pool = "Очки навыков доступные для распределения"
+
+class ArmorDamageTypeChoice(Enum):
+    """Тип урона по броне"""
+    EAC = "ЭКБ"
+    KAC = "ККБ"
+    EAC_KAC = "ЭКБ & ККБ"
+
+class DiceTypeChoice(Enum):
+    """Тип броска кубика"""
+    D3 = "d3"
+    D4 = "d4"
+    D6 = "d6"
+    D8 = "d8"
+    D10 = "d10"
+    D12 = "d12"
+    D20 = "d20"
+    D100 = "d100"
