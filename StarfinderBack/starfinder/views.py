@@ -49,8 +49,8 @@ class WeaponView(viewsets.ViewSet):
         """
         Получение списка оружия
         """
-        weapon = Weapon.objects.all()                
-        serializer = WeaponSerializer(weapon, many=True)
+        weapons = Weapon.objects.all()                
+        serializer = WeaponSerializer(weapons, many=True)
         return Response({"Weapons": serializer.data})
 
     def retrieve(self, request, pk=None):

@@ -41,7 +41,7 @@ class ArmorDamageTypeChoice(Enum):
     EAC_KAC = "ЭКБ & ККБ"
 
 class DiceTypeChoice(Enum):
-    """Тип броска кубика"""
+    """Тип кубика"""
     D3 = "d3"
     D4 = "d4"
     D6 = "d6"

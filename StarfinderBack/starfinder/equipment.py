@@ -13,7 +13,7 @@ class BaseEquipment(models.Model):
 class WeaponCategory(models.Model):
     """Категория оружия"""
     name = models.CharField(max_length=255) # название категории
-    discription = models.TextField(null=True, blank=True)  # описание
+    description = models.TextField(null=True, blank=True)  # описание
     armor_damage_type = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
                             for tag in ArmorDamageTypeChoice])  # тип брони, блокирующий урон
@@ -21,17 +21,17 @@ class WeaponCategory(models.Model):
 class WeaponType(models.Model):
     """Тип оружия"""
     name = models.CharField(max_length=255) # название типа оружия
-    discription = models.TextField(null=True, blank=True)  # описание
+    description = models.TextField(null=True, blank=True)  # описание
 
 class CriticalEffect(models.Model):
     """Тип критического удара"""
     name = models.CharField(max_length=255) # название крита
-    discription = models.TextField(null=True, blank=True)  # описание
+    description = models.TextField(null=True, blank=True)  # описание
 
 class WeaponSpecial(models.Model):
     """Особые свойства оружия"""
     name = models.CharField(max_length=255) # название 
-    discription = models.TextField(null=True, blank=True)  # описание
+    description = models.TextField(null=True, blank=True)  # описание
 
 class Weapon(BaseEquipment):
     """Базовый класс для оружия"""
@@ -47,6 +47,6 @@ class Weapon(BaseEquipment):
                             for tag in DiceTypeChoice],null=True, blank=True)  # количество граней кубика                         
     category = models.ForeignKey('WeaponCategory', on_delete=models.PROTECT) # категория оружия
     weapon_type = models.ForeignKey('WeaponType', on_delete=models.PROTECT) # тип оружия
-    secial = models.ManyToManyField(WeaponSpecial) # особые свойства оружия
+    special = models.ManyToManyField(WeaponSpecial) # особые свойства оружия
 
 
