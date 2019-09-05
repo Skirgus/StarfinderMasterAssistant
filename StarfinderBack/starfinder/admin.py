@@ -3,6 +3,7 @@ from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Alignment, Deity, Theme, GameClass, Skill, World, Language
 from .ruleModels import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp,SubRaceRulesActingOnCharLevelUp
 from .ruleModels import ThemeClassSkills, ClassSkills
+from .equipment import BaseEquipment, WeaponCategory, WeaponType, CriticalEffect, WeaponSpecial, Weapon
 
 # Register your models here.
 
@@ -23,3 +24,9 @@ admin.site.register(ClassRulesActingOnCharLevelUp)
 admin.site.register(SubRaceRulesActingOnCharLevelUp)
 admin.site.register(ThemeClassSkills)
 admin.site.register(ClassSkills)
+admin.site.register(BaseEquipment)
+admin.site.register(WeaponCategory)
+admin.site.register(WeaponType)
+admin.site.register(CriticalEffect)
+admin.site.register(WeaponSpecial)
+admin.site.register(Weapon)

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
 from .models import Character, Deity, World, Language
+from .equipment import Weapon
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -96,6 +97,11 @@ class WorldListSerializer(serializers.ModelSerializer):
     class Meta:
         model = World
         fields = ('id', 'name', 'planet_image')
+
+class WeaponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Weapon
+        fields = '__all__'
 
 class WorldSerializer(serializers.ModelSerializer):
     language = serializers.CharField(read_only=True, source="language.name")
