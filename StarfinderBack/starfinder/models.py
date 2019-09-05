@@ -106,6 +106,9 @@ class Deity(models.Model):
     portfolios = models.CharField(max_length =255) # область интересов
     description = models.TextField()
     symbol = models.ImageField(upload_to='deities/', null=True, blank=True) # изображение
+    
+    def __str__(self):
+        return self.name 
 
 
 class Subrace(models.Model):
@@ -190,7 +193,6 @@ class Skill(models.Model):
     
     def __str__(self):
         return self.name 
-
 
 class Character(models.Model): 
     """Персонаж""" 
