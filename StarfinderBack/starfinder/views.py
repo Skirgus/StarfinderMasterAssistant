@@ -20,6 +20,7 @@ from .builders import CharacterBuilder
 from .dto import AbilityValueBlankDto
 from .characterManager import CharacterManager
 from .equipment import Weapon
+from .feat import Feat, FeatListSerializer
 import json
 
 # Create your views here.
@@ -232,3 +233,18 @@ class CharacterView(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        """Удаление персонажа"""
+        character = get_object_or_404(Character.objects.all(), pk=pk)
+        character.delete()
+        return Response({
+            "message": "Персонаж с  id `{}` удален.".format(pk)
+        }, status=204)
+
+class FeatView(viewsets.ViewSet):
+     def list(self, request):
+        """Получение списка черт"""
+        feats = Feat.objects.all()                
+        serializer = FeatListSerializer(feats, many=True)
+        return Response({"feats": serializer.data})
