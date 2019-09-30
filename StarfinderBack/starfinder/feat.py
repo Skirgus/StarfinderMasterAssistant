@@ -10,6 +10,11 @@ class RuleChoice(Enum):
     must_be = "Должно быть"
     must_be_absent = "Должно отсутствовать"
 
+class PrerequestUnionChoice(Enum):
+    """Правила объединения предусловий"""
+    And = 'И'
+    Or = 'Или'
+
 
 class Feat(models.Model):
     """Черта"""
@@ -25,28 +30,22 @@ class Feat(models.Model):
 
 class FeatPrerequest(models.Model):
     """Требования к черте"""
-    And = 'And'
-    Or = 'Or'
-    PREREQUEST_UNION_RULE_CHOICES = (
-        (And, 'И'),
-        (Or, 'Или')
-    )
-    union_rule = models.CharField(max_length=255,choices=PREREQUEST_UNION_RULE_CHOICES, default=And) # условие объединения предусловий
+    union_rule = models.CharField(max_length=255,choices=[(tag.name, tag.value) 
+                            for tag in PrerequestUnionChoice], default=PrerequestUnionChoice.And) # условие объединения предусловий
     description = models.CharField(max_length=255) # описание
-    feat = models.ForeignKey('Feat', on_delete=models.CASCADE) # черта для которой действует правило
+    feat = models.ForeignKey('Feat', related_name = 'prerequests', on_delete=models.CASCADE) # черта для которой действует правило
     required_feat = models.ForeignKey('Feat', on_delete=models.PROTECT, null=True, blank=True) # требуемая черта
     ability = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
                             for tag in AbilityChoice], null=True, blank=True)  # характеристика
     skill = models.ForeignKey('Skill', on_delete=models.PROTECT, null=True, blank=True) # навык
-    game_class = models.ForeignKey('GameClass', on_delete=models.PROTECT, null=True, blank=True) # класс
     character_property = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
                             for tag in CharacterPropertiesChoice], null=True, blank=True)  # свойство персонажа  
     value = models.IntegerField(null=True, blank=True) # значение
     rule = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
-                            for tag in RuleChoice])  # характеристика
+                            for tag in RuleChoice])  # правило для выполнения условия
     def __str__(self):
         return self.feat.name + self.description
 

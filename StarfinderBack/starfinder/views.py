@@ -243,8 +243,16 @@ class CharacterView(viewsets.ViewSet):
         }, status=204)
 
 class FeatView(viewsets.ViewSet):
-     def list(self, request):
+    def list(self, request):
         """Получение списка черт"""
         feats = Feat.objects.all()                
+        serializer = FeatListSerializer(feats, many=True)
+        return Response({"feats": serializer.data})
+
+    def get_feats_by_character(self, request, character_id):
+        """Получение списка черт доступны для выбора персонажем"""
+        queryset = Character.objects.all()
+        character = get_object_or_404(queryset, pk=character_id)
+        feats = CharacterManager(character).get_feats_by_character() 
         serializer = FeatListSerializer(feats, many=True)
         return Response({"feats": serializer.data})
