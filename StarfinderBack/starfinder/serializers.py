@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
 from .models import Character, Deity, World, Language
-from .equipment import Weapon
+from .equipment import Weapon, Armor
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -102,6 +102,12 @@ class WeaponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weapon
         fields = '__all__'
+
+class ArmorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Armor
+        fields = '__all__'
+
 
 class WorldSerializer(serializers.ModelSerializer):
     language = serializers.CharField(read_only=True, source="language.name")
