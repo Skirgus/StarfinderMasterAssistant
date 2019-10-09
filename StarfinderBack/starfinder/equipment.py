@@ -1,5 +1,5 @@
 from django.db import models
-from .choices import ArmorDamageTypeChoice, DiceTypeChoice
+from .choices import ArmorDamageTypeChoice, DiceTypeChoice, ArmorType
 
 class BaseEquipment(models.Model):
     """Базовый класс для снаряжения"""
@@ -9,6 +9,7 @@ class BaseEquipment(models.Model):
     level = models.IntegerField() # уровень снаряжения
     price = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True) # стоимость снаряжения
     bulk = models.DecimalField(max_digits=5, decimal_places=2) # вес снаряжения
+    image = models.ImageField(upload_to='equipment/', null=True, blank=True) # миниатюра для списка
 
 class WeaponCategory(models.Model):
     """Категория оружия"""
@@ -49,4 +50,15 @@ class Weapon(BaseEquipment):
     weapon_type = models.ForeignKey('WeaponType', on_delete=models.PROTECT) # тип оружия
     special = models.ManyToManyField(WeaponSpecial) # особые свойства оружия
 
+class Armor(BaseEquipment):
+    """Базовый класс для брони"""
+    type_armor = models.CharField(max_length=255, 
+                            choices=[(tag.name, tag.value) 
+                            for tag in ArmorType],null=False, blank=True)  # тип брони
+    eac = models.IntegerField() # ЭКБ броня
+    kac = models.IntegerField() # ККБ броня
+    armor_check_penalty = models.IntegerField() #  штраф за ношение брони 
+    speed_adjustment = models.IntegerField() # скорость
+    upgrade_slots = models.IntegerField() # количество слотов под улучшения
+    max_dex = models.IntegerField() # максимальная ловкость
 

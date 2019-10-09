@@ -50,3 +50,8 @@ class DiceTypeChoice(Enum):
     D12 = "d12"
     D20 = "d20"
     D100 = "d100"
+
+class ArmorType(Enum):
+    """Тип брони"""
+    light = "Легкая броня"
+    heavy = "Тяжелая броня"
