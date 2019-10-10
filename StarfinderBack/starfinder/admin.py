@@ -4,6 +4,7 @@ from .models import Alignment, Deity, Theme, GameClass, Skill, World, Language
 from .ruleModels import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp,SubRaceRulesActingOnCharLevelUp
 from .ruleModels import ThemeClassSkills, ClassSkills
 from .equipment import BaseEquipment, WeaponCategory, WeaponType, CriticalEffect, WeaponSpecial, Weapon, ArmorType, Armor
+from .feat import Feat, FeatPrerequest
 
 # Register your models here.
 
@@ -31,3 +32,5 @@ admin.site.register(CriticalEffect)
 admin.site.register(WeaponSpecial)
 admin.site.register(Weapon)
 admin.site.register(Armor)
+admin.site.register(Feat)
+admin.site.register(FeatPrerequest)

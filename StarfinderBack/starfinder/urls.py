@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RacesView, ThemeView, GameClassView, CharacterView, WorldsView, LanguageView, WeaponView, ArmorView
+from .views import RacesView, ThemeView, GameClassView, CharacterView, WorldsView, LanguageView, WeaponView, ArmorView, FeatView
 from .authorization import login
 app_name = "starfinder"
 
@@ -22,9 +22,11 @@ urlpatterns = [
     path('characters/<int:pk>', CharacterView.as_view({'delete': 'delete'})),   
     path('characters/<int:pk>/character_blank', CharacterView.as_view({'get': 'character_blank'})),
     path('feats/', FeatView.as_view({'get': 'list'})),
+    path('feats/bycharacter/<int:character_id>', FeatView.as_view({'get': 'get_feats_by_character'})),
+    path('feats/tocharacter/', FeatView.as_view({'post': 'add_feat_to_character'})),
     path('login/', login),
     path('weapons/', WeaponView.as_view({'get': 'list'})),
     path('weapons/<int:pk>', WeaponView.as_view({'get': 'retrieve'})), 
     path('armors/', ArmorView.as_view({'get': 'list'})),
-    path('armors/<int:pk>', ArmorView.as_view({'get': 'retrieve'})) 
+    path('armors/<int:pk>', ArmorView.as_view({'get': 'retrieve'}))
 ]

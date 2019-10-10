@@ -171,3 +171,6 @@ class AbilityValue(models.Model):
 
     def get_temp_modifier(self):
         return self.temp_value//2 - 5
+
+
+    

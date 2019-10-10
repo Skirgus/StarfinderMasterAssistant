@@ -1,6 +1,7 @@
 from django.db import models
 from .choices import AbilityChoice, CharacterPropertiesChoice
 from rest_framework import serializers
+from enum import Enum
    
 
 class RuleChoice(Enum):
@@ -47,9 +48,9 @@ class FeatPrerequest(models.Model):
                             choices=[(tag.name, tag.value) 
                             for tag in RuleChoice])  # правило для выполнения условия
     def __str__(self):
-        return self.feat.name + self.description
+        return self.feat.name + ' ' + self.description
 
-class FeatPrerequestSerializer():
+class FeatPrerequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeatPrerequest
         fields = ('id', 'description', 'union_rule')

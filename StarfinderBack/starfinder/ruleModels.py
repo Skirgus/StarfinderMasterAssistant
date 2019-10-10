@@ -76,3 +76,4 @@ class ClassSkills(SetClassSkill):
 
     def __str__(self):
         return self.game_class.name + ' (' + self.skill.name + ')'
+        

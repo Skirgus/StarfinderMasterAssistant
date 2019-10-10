@@ -12,7 +12,8 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass, Character, Deity, World, Language
+from .models import Theme, GameClass, Deity, World, Language
+from .character import Character
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer, LanguageSerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
 from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer, ArmorSerializer
@@ -276,3 +277,25 @@ class FeatView(viewsets.ViewSet):
         feats = CharacterManager(character).get_feats_by_character() 
         serializer = FeatListSerializer(feats, many=True)
         return Response({"feats": serializer.data})
+
+    def add_feat_to_character(self, request):
+        """Добавление черты персонажу"""
+        feat_id = request.data['feat_id']
+        if feat_id is None:
+            raise ValueError("Не передан идентификатор черты")
+        character_id = request.data['character_id']
+        if character_id is None:
+            raise ValueError("Не передан идентификатор персонажа") 
+        feat_queryset = Feat.objects.all()
+        feat = get_object_or_404(feat_queryset, pk=feat_id)
+        characters = Character.objects.all()
+        character = get_object_or_404(characters, pk=character_id)
+        if CharacterManager(character).validate_feat(feat):
+            character.feats.add(feat)
+            character.save()
+        else:
+            raise ValueError("Персонаж не удовлетворяет условиям черты")
+
+        return Response({
+            "message": "Черта успешно добавлена"
+        }, status=200)

@@ -1,9 +1,10 @@
 import django
 from django.db.models import Q
 from itertools import chain
-from .models import Character, Race, Alignment, Deity, Theme, GameClass
+from .models import Race, Alignment, Deity, Theme, GameClass
 from .models import Skill, World, Subrace
 from .choices import AbilityChoice
+from .character import Character
 
 
 class CharacterBuilder():    

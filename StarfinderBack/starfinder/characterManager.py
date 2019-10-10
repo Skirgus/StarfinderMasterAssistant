@@ -80,84 +80,90 @@ class CharacterManager():
         feat_by_choice = []
         character_feats = self.character.feats.all()
         for feat in feats_queryset:
-            character_feat = self.character.feats.get(id=feat.id)
-            if character_feat is not None:
-                continue
-
-            prerequests = feat.prerequests.all()  
-            if len(prerequests) == 0:
+            if self.validate_feat(feat):
                 feat_by_choice.append(feat)
-                continue
-            
-            prerequest_handle_result = None
-            for prerequest in prerequests:
-                prerequest_handle_result = _handle_feat_prerequest(prerequest, prerequest_handle_result)
-            
-            if prerequest_handle_result:
-                feat_by_choice.append(feat)
-                continue
         return feat_by_choice
+
+
+    def validate_feat(self, feat):
+        """Проверка, удовлетворяет ли персонаж условиям черты"""        
+        character_feat = self.character.feats.filter(id=feat.id).count()
+        if character_feat > 0:
+            return False
+
+        prerequests = feat.prerequests.all()  
+        if len(prerequests) == 0:
+            return True
+        
+        prerequest_handle_result = None
+        for prerequest in prerequests:
+            prerequest_handle_result = self._handle_feat_prerequest(prerequest, prerequest_handle_result)
+        return prerequest_handle_result
 
 
     def _handle_feat_prerequest(self, prerequest, prev_prerequest_result = None):
         """Обработка условия черты"""        
         if prerequest.ability is not None:
-            prerequest_match = _check_ability(prerequest)
+            prerequest_match = self._check_ability(prerequest)
         elif prerequest.skill is not None:
-            prerequest_match = _check_skills(prerequest)
+            prerequest_match = self._check_skills(prerequest)
         elif prerequest.character_property is not None:
-            prerequest_match is _check_property(prerequest) 
+            prerequest_match = self._check_property(prerequest) 
         elif prerequest.required_feat is not None:
-            prerequest_match  = _check_character_feats
+            prerequest_match  = self._check_character_feats(prerequest)
 
         if prev_prerequest_result is None:
             return prerequest_match
-        elif prerequest.union_rule == PrerequestUnionChoice.And:
+        elif prerequest.union_rule == PrerequestUnionChoice.And.name:
             return prerequest_match and prev_prerequest_result
         else:
             return prerequest_match or prev_prerequest_result
 
+
     def _check_ability(self, prerequest):
         """Проверка характеристики"""
-        character_ability_value = self.character.get_ability(prerequest.ability)
-        if prerequest.rule == RuleChoice.at_least:
+        character_ability_value = self.character.get_ability(prerequest.ability).value
+        if prerequest.rule == RuleChoice.at_least.name:
             return character_ability_value >= prerequest.value
-        elif prerequest.rule == RuleChoice.less:
+        elif prerequest.rule == RuleChoice.less.name:
             return character_ability_value < prerequest.value
         else:
-             raise ValueError("Не коррректно составлено пhедусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
+             raise ValueError("Не коррректно составлено предусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
              "Для предусловий характеристик должны быть выбраны правила или 'Не менее' или 'Меньше'")
+
 
     def _check_skills(self, prerequest):
         """Проверка навыков"""
         skill_value = self.character.skillvalues.get(skill=prerequest.skill).skill_points
-        if prerequest.rule == RuleChoice.at_least:
+        if prerequest.rule == RuleChoice.at_least.name:
                 return skill_value >= prerequest.value
-        elif prerequest.rule == RuleChoice.less:
+        elif prerequest.rule == RuleChoice.less.name:
             return skill_value < prerequest.value
-        elif prerequest.rule == RuleChoice.must_be:
+        elif prerequest.rule == RuleChoice.must_be.name:
             return (skill_value is None or skill_value > 0)
         else:
             return skill_value is None or skill_value <= 0
 
+
     def _check_property(self, prerequest):
         """Проверка свойств персонажа"""
         property_value =  self.character.__dict__[prerequest.character_property]
-        if prerequest.rule == RuleChoice.at_least:
+        if prerequest.rule == RuleChoice.at_least.name:
                 return property_value >= prerequest.value
-        elif prerequest.rule == RuleChoice.less:
+        elif prerequest.rule == RuleChoice.less.name:
             return property_value < prerequest.value
         else:
-             raise ValueError("Не коррректно составлено пhедусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
+             raise ValueError("Не коррректно составлено предусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
              "Для предусловий свойств персонажа должны быть выбраны правила или 'Не менее' или 'Меньше'")        
 
+
     def _check_character_feats(self, prerequest):
-        """Проверка существующих черт персонажа"""
-        feat = self.character.feats.get(id=prerequest.required_feat.id)
-        if prerequest.rule == RuleChoice.must_be:
-            return feat is not None
-        elif prerequest.rule == RuleChoice.must_be_absent:
-            return feat is None
+        """Проверка существующих черт персонажа"""        
+        feat = self.character.feats.filter(id=prerequest.required_feat.id).count()
+        if prerequest.rule == RuleChoice.must_be.name:            
+            return feat > 0
+        elif prerequest.rule == RuleChoice.must_be_absent.name:
+            return feat == 0
         else:
-            raise ValueError("Не коррректно составлено пhедусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
+            raise ValueError("Не коррректно составлено предусловие " + prerequest.feat.name + "-" + prerequest.description + ". " +
              "Для предусловий черт должны быть выбраны правила или 'Должны быть' или 'Должны отсутствовать'")       
