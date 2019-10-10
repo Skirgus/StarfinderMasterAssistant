@@ -15,11 +15,11 @@ from .models import Race, RaceDescription, RacePlayingFor
 from .models import Theme, GameClass, Character, Deity, World, Language
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer, LanguageSerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
-from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer
+from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer, ArmorSerializer
 from .builders import CharacterBuilder
 from .dto import AbilityValueBlankDto
 from .characterManager import CharacterManager
-from .equipment import Weapon
+from .equipment import Weapon, Armor
 from .feat import Feat, FeatListSerializer
 import json
 
@@ -63,6 +63,26 @@ class WeaponView(viewsets.ViewSet):
         queryset = Weapon.objects.all()
         weapon = get_object_or_404(queryset, pk=pk)
         serializer = WeaponSerializer(weapon)        
+        return Response(serializer.data)
+
+class ArmorView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка брони
+        """
+        armors = Armor.objects.all()                
+        serializer = ArmorSerializer(armors, many=True)
+        return Response({"Armors": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Получение брони по идентификатору
+
+        pk - идентификатор брони
+        """
+        queryset = Armor.objects.all()
+        armor = get_object_or_404(queryset, pk=pk)
+        serializer = ArmorSerializer(armor)        
         return Response(serializer.data)
 
 class WorldsView(viewsets.ViewSet):
