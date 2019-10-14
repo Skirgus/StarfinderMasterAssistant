@@ -1,8 +1,10 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
-from .models import Theme, GameClass, AbilityValue, CharacterSkillValue, CharacterGameClass
-from .models import Character, Deity, World, Language
+from .models import Theme, GameClass
+from .models import Deity, World, Language
+from .character import Character, CharacterSkillValue, CharacterGameClass, AbilityValue
 from .equipment import Weapon, Armor
+from .feat import FeatListSerializer
 
 class RaceDescriptionSerializer(serializers.ModelSerializer):
      class Meta:
@@ -146,16 +148,18 @@ class CharacterSerializer(serializers.ModelSerializer):
     race = CharacterRaceSerializer(many=False, read_only = False)
     theme = CharacterThemeSerilizer(many=False, read_only = False) 
     home_world = WorldSerializer(many=False, read_only=False)   
+    feats = FeatListSerializer(many = True, read_only = False)
     class Meta:
         model = Character
-        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'home_world', 'ability_pool',
+        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'home_world', 'ability_pool', 'feats_pool',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
-            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points')
+            'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points', 'feats')
 
     def update(self, instance, validated_data):
         ability_values_data = validated_data.pop('abilityvalues')
         skill_values_data = validated_data.pop('skillvalues')
         game_classes_data = validated_data.pop('gameclasses')
+        feats_data = validated_data.pop('feats')
 
         abilityvalues = (instance.abilityvalues).all()
         abilityvalues = list(abilityvalues)
