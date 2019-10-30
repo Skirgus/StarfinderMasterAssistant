@@ -33,7 +33,7 @@ class RacesView(viewsets.ViewSet):
         """
         races = Race.objects.all()                
         serializer = RaceListSerializer(races, many=True)
-        return Response({"races": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -53,7 +53,7 @@ class WeaponView(viewsets.ViewSet):
         """
         weapons = Weapon.objects.all()                
         serializer = WeaponSerializer(weapons, many=True)
-        return Response({"Weapons": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -73,7 +73,7 @@ class ArmorView(viewsets.ViewSet):
         """
         armors = Armor.objects.all()                
         serializer = ArmorSerializer(armors, many=True)
-        return Response({"Armors": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -93,7 +93,7 @@ class WorldsView(viewsets.ViewSet):
         """
         worlds = World.objects.all()
         serializer = WorldListSerializer(worlds, many=True)
-        return Response({"worlds": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -112,7 +112,7 @@ class ThemeView(viewsets.ViewSet):
         """
         theme = Theme.objects.all()                
         serializer = ThemeListSerializer(theme, many=True)
-        return Response({"themes": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -132,7 +132,7 @@ class DeityView(viewsets.ViewSet):
         """
         deity = Deity.objects.all()                
         serializer = DeitySerializer(deity, many=True)
-        return Response({"deities": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -152,7 +152,7 @@ class LanguageView(viewsets.ViewSet):
         """
         language = Language.objects.all()                
         serializer = LanguageSerializer(language, many=True)
-        return Response({"Languages": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -172,7 +172,7 @@ class GameClassView(viewsets.ViewSet):
         """
         game_class = GameClass.objects.all()                
         serializer = GameClassListSerializer(game_class, many=True)
-        return Response({"game_classes": serializer.data})
+        return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         """
@@ -192,7 +192,7 @@ class CharacterView(viewsets.ViewSet):
         queryset = Character.objects.all()
         userCharacters = get_list_or_404(queryset, user=request.user)
         serializer = CharacterListSerializer(userCharacters, many=True)
-        return Response({"characters": serializer.data})
+        return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
     def character_blank(self, request, pk=None):
@@ -268,7 +268,7 @@ class FeatView(viewsets.ViewSet):
         """Получение списка черт"""
         feats = Feat.objects.all()                
         serializer = FeatListSerializer(feats, many=True)
-        return Response({"feats": serializer.data})
+        return Response(serializer.data)
 
     def get_feats_by_character(self, request, character_id):
         """Получение списка черт доступны для выбора персонажем"""
@@ -276,7 +276,7 @@ class FeatView(viewsets.ViewSet):
         character = get_object_or_404(queryset, pk=character_id)
         feats = CharacterManager(character).get_feats_by_character() 
         serializer = FeatListSerializer(feats, many=True)
-        return Response({"feats": serializer.data})
+        return Response(serializer.data)
 
     def add_feat_to_character(self, request):
         """Добавление черты персонажу"""
