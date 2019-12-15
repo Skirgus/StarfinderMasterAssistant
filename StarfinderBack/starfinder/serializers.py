@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Theme, GameClass
-from .models import Deity, World, Language
+from .models import Deity, World, Language, Alignment
 from .character import Character, CharacterSkillValue, CharacterGameClass, AbilityValue
 from .equipment import Weapon, Armor
 from .feat import FeatListSerializer
@@ -52,6 +52,12 @@ class ThemeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Theme
         fields = ('id', 'name', 'title_info', 'title_image')
+
+
+class AlignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alignment
+        fields = '__all__'
 
 
 class ThemeSerializer(serializers.ModelSerializer):
@@ -152,6 +158,7 @@ class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'home_world', 'ability_pool', 'feats_pool',
+            'experience_to_level_up', 'experience',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
             'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points', 'feats')
 

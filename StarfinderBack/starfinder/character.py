@@ -35,46 +35,17 @@ class Character(models.Model):
     languages = models.ManyToManyField(Language) # языки персонажа
     feats_pool = models.IntegerField(default = 0) # количество черт доступных для выбора
     feats = models.ManyToManyField(Feat) # черты персонажа
+    experience = models.IntegerField(default=0) # опыт
+    experience_to_level_up = models.IntegerField(default=0) #опыт для повышения уровня
+
+    def level_up_available(self):
+        """Доступно повышение уровня"""
+        return experience >= experience_to_level_up
 
     def get_ability(self, tag):
         """Получение характеристики персонажа"""
         ability_value =  self.abilityvalues.get(ability=tag)
         return ability_value
-
-    def go_to_level(self, level, class_id):
-        """Обработка перехода на указанный уровень"""
-        race_rules = self.race.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        theme_rules = self.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        subrace_rules = []
-        if self.subrace is not None:
-            subrace_rules = self.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-        character_game_class = self.gameclasses.get(game_class_id = class_id)
-        class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
-
-        rules = list(chain(race_rules, theme_rules, class_rules, subrace_rules))        
-
-        for rule in rules:
-            if rule.operation == OperationChoice.Add.name:
-                if rule.ability is not None:               
-                    self.add_ability_value(rule.ability, rule.change_to)
-                elif rule.skill is not None:
-                    self.add_skill_value(rule.skill, rule.change_to)
-                elif rule.character_property is not None:
-                    self.__dict__[rule.character_property] += rule.change_to
-            elif rule.operation == OperationChoice.Set.name:
-                if rule.ability is not None:               
-                    self.set_ability_value(rule.ability, rule.change_to)
-                elif rule.skill is not None:
-                    self.set_skill_value(rule.skill, rule.change_to)
-                elif rule.character_property is not None:
-                    self.__dict__[rule.character_property] = rule.change_to
-
-        int_ability = self.get_ability(AbilityChoice.INT.name)
-        self.skill_points_pool += int_ability.get_modifier()
-
-        con_ability = self.get_ability(AbilityChoice.CON.name)
-        self.stamina_points += con_ability.get_modifier()
-        self.save()
 
     def add_ability_value(self, ability, value):
         """Прибавить значение к характеристике"""

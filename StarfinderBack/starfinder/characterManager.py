@@ -1,6 +1,11 @@
 from .dto import AbilityValueBlankDto, CharacterClassBlankDto, SkillValueBlankDto, CharacterBlankDto
-from .choices import AbilityChoice
+from .choices import AbilityChoice, OperationChoice
 from .feat import Feat, RuleChoice, PrerequestUnionChoice
+from .models import GameClass
+from .ruleModels import GeneralRulesOnCharLevelUp
+from .character import CharacterGameClass
+from django.db.models import Q
+from itertools import chain
 
 class CharacterManager():
     """
@@ -49,6 +54,95 @@ class CharacterManager():
         #todo заглушка, в дальгейшем тут надо описанть получение прочих модификаторов инициативы
         return 0
 
+    
+    def level_up(self, game_class_id):
+        """
+        Повышение уровня персонажа
+        """    
+        if not self.character.level_up_available:
+            raise ValueError("Повышение уровня не доступно")
+
+        self.character.level += 1
+        self._set_class(game_class_id)
+        self._handle_level_up(game_class_id)
+
+
+    def _handle_level_up(self, class_id):
+        """Обработка перехода на указанный уровень"""
+        character = self.character
+        level = character.level
+        general_rules = GeneralRulesOnCharLevelUp.objects.filter(Q(level=level) | Q(level=0))
+        race_rules = character.race.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        theme_rules = character.theme.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        subrace_rules = []
+        if character.subrace is not None:
+            subrace_rules = character.subrace.rulesactingoncharlevelup.filter(Q(level=level) | Q(level=0))
+        character_game_class = character.gameclasses.get(game_class_id = class_id)
+        class_rules = character_game_class.game_class.rulesactingoncharlevelup.filter(Q(level=character_game_class.level) | Q(level=0))
+
+        rules = list(chain(general_rules, race_rules, theme_rules, class_rules, subrace_rules))        
+
+        for rule in rules:
+            if rule.operation == OperationChoice.Add.name:
+                if rule.ability is not None:               
+                    character.add_ability_value(rule.ability, rule.change_to)
+                elif rule.skill is not None:
+                    character.add_skill_value(rule.skill, rule.change_to)
+                elif rule.character_property is not None:
+                    character.__dict__[rule.character_property] += rule.change_to
+            elif rule.operation == OperationChoice.Set.name:
+                if rule.ability is not None:               
+                    character.set_ability_value(rule.ability, rule.change_to)
+                elif rule.skill is not None:
+                    character.set_skill_value(rule.skill, rule.change_to)
+                elif rule.character_property is not None:
+                    character.__dict__[rule.character_property] = rule.change_to
+
+        int_ability = character.get_ability(AbilityChoice.INT.name)
+        character.skill_points_pool += int_ability.get_modifier()
+
+        con_ability = character.get_ability(AbilityChoice.CON.name)
+        character.stamina_points += con_ability.get_modifier()
+        character.save()
+
+    
+    def _set_class(self, class_id):
+        """
+        Задает класс при повышении уровня
+        """
+        character = self.character
+        try:
+            character_game_class = character.gameclasses.get(game_class_id = class_id)
+            character_game_class.level += 1
+            character_game_class.save()
+        except CharacterGameClass.DoesNotExist:
+            game_class = GameClass.objects.get(id=class_id)
+            character.gameclasses.create(game_class=game_class, level=1)
+            self._set_class_skills(class_id)
+
+
+    def _set_class_skills(self, class_id):
+        """
+        Устанавливает классовые способности персонажа
+        """
+        character = self.character
+        theme_rules = character.theme.set_class_skill_rules.all()
+
+        character_game_class = character.gameclasses.get(game_class_id = class_id)
+        class_rules = character_game_class.game_class.set_class_skill_rules.all()
+                
+        rules = list(chain(theme_rules, class_rules)) 
+
+        for rule in rules:
+            rule_skill = rule.skill
+            character_skill = character.skillvalues.get(skill=rule_skill)
+            if character_skill.class_skill:
+                character_skill.skill_points += 1
+            else: 
+                character_skill.class_skill = True
+            character_skill.save()
+
+
     def get_skill_values(self):
         """
         Получение списка dto навыков
@@ -64,6 +158,7 @@ class CharacterManager():
             skill_values.append(dto)
         return skill_values
 
+
     def get_blank_dto(self):
         """
         Получение dto персонажа, для распечатки бланка персонажа
@@ -73,6 +168,7 @@ class CharacterManager():
         skills = self.get_skill_values()
         initiative_modifier = self.get_initiative_modifier()
         return CharacterBlankDto(self.character, initiative_modifier, classes, abilities, skills)
+
     
     def get_feats_by_character(self):
         """Получение черт доступных для выбора персонажем"""

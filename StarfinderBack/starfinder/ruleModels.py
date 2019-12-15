@@ -13,6 +13,7 @@ class RulesActingOnCharLevelUp(BaseRule):
     """Базовый класс для правил действующих на персонажа при повышении уровня"""
     class Meta:
         abstract = True
+
     level = models.IntegerField() # уровень при достижении которого срабатывает правило
     ability = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
@@ -25,6 +26,11 @@ class RulesActingOnCharLevelUp(BaseRule):
     operation = models.CharField(max_length=255, 
                             choices=[(tag.name, tag.value) 
                             for tag in OperationChoice], null=True, blank=True)  # операция
+
+class GeneralRulesOnCharLevelUp(RulesActingOnCharLevelUp):
+    """Базовые правила игры при повышении уровня"""
+    def __str__(self):
+        return 'Общие правила (' + self.name+ ')'
 
 class RaceRulesActingOnCharLevelUp(RulesActingOnCharLevelUp):
     """Правила расы действующие при повышении в уровне"""
