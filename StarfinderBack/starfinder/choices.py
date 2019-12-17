@@ -33,6 +33,8 @@ class CharacterPropertiesChoice(Enum):
     resolve_points = "Пункты решимости"
     ability_pool = "Очки характеристик доступные для распределения"
     skill_points_pool = "Очки навыков доступные для распределения"
+    feats_pool = "Количество черт доступных для выбора"
+    experience_to_level_up = "Опыт для повышения уровня"
 
 class ArmorDamageTypeChoice(Enum):
     """Тип урона по броне"""

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Race, RaceDescription, RacePlayingFor, Subrace
 from .models import Alignment, Deity, Theme, GameClass, Skill, World, Language
 from .ruleModels import RaceRulesActingOnCharLevelUp, ThemeRulesActingOnCharLevelUp, ClassRulesActingOnCharLevelUp,SubRaceRulesActingOnCharLevelUp
-from .ruleModels import ThemeClassSkills, ClassSkills
+from .ruleModels import ThemeClassSkills, ClassSkills, GeneralRulesOnCharLevelUp
 from .equipment import BaseEquipment, WeaponCategory, WeaponType, CriticalEffect, WeaponSpecial, Weapon, ArmorType, Armor
 from .feat import Feat, FeatPrerequest
 
@@ -19,10 +19,13 @@ admin.site.register(Theme)
 admin.site.register(GameClass)
 admin.site.register(Skill)
 admin.site.register(World)
+
+admin.site.register(GeneralRulesOnCharLevelUp)
 admin.site.register(RaceRulesActingOnCharLevelUp)
 admin.site.register(ThemeRulesActingOnCharLevelUp)
 admin.site.register(ClassRulesActingOnCharLevelUp)
 admin.site.register(SubRaceRulesActingOnCharLevelUp)
+
 admin.site.register(ThemeClassSkills)
 admin.site.register(ClassSkills)
 admin.site.register(BaseEquipment)

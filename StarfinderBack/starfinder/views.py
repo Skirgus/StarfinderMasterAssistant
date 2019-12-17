@@ -12,11 +12,11 @@ from django.core import serializers
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from .models import Race, RaceDescription, RacePlayingFor
-from .models import Theme, GameClass, Deity, World, Language
+from .models import Theme, GameClass, Deity, World, Language, Alignment
 from .character import Character
 from .serializers import RaceSerializer, RaceDescriptionSerializer, RacePlayingForSerializer, RaceListSerializer, DeitySerializer, LanguageSerializer
 from .serializers import ThemeListSerializer, ThemeSerializer, GameClassListSerializer, GameClassSerializer, CharacterListSerializer, CharacterSerializer
-from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer, ArmorSerializer
+from .serializers import WorldSerializer, WorldListSerializer, WeaponSerializer, ArmorSerializer, AlignmentSerializer
 from .builders import CharacterBuilder
 from .dto import AbilityValueBlankDto
 from .characterManager import CharacterManager
@@ -164,6 +164,16 @@ class LanguageView(viewsets.ViewSet):
         language = get_object_or_404(queryset, pk=pk)
         serializer = LanguageSerializer(language)        
         return Response(serializer.data)
+
+class AlignmentView(viewsets.ViewSet):
+    def list(self, request):
+        """
+        Получение списка мировоззрений
+        """
+        alignments = Alignment.objects.all()                
+        serializer = AlignmentSerializer(alignments, many=True)
+        return Response(serializer.data)
+
         
 class GameClassView(viewsets.ViewSet):
     def list(self, request):
@@ -234,17 +244,28 @@ class CharacterView(viewsets.ViewSet):
             raise ValueError("Не задано мировоззрение")
         deity_id = request.data['deity_id']
         world_id = request.data['world_id']
-        subrace_id = request.data['subrace_id']
-        class_id = request.data['class_id']
-        if class_id is None:
-            raise ValueError("Не задан класс")
+        subrace_id = request.data['subrace_id']       
         gender = request.data['gender']
         user = request.user
-        builder = CharacterBuilder()
-        character = builder.character(name, race_id, theme_id, alignment_id,
-                     deity_id, class_id, gender, user, world_id, subrace_id)
-        serializer = CharacterSerializer(character)        
-        return Response(serializer.data)
+        character = None
+        try:
+            builder = CharacterBuilder()
+            character = builder.character(name, race_id, theme_id, alignment_id,
+                        deity_id, gender, user, world_id, subrace_id)
+
+            class_id = request.data['class_id']
+            if class_id is None:
+                raise ValueError("Не задан класс")
+            
+            CharacterManager(character).level_up(class_id)
+
+            serializer = CharacterSerializer(character)        
+            return Response(serializer.data)
+        except Exception:
+            if character is not None and character.id is not None:
+                    character.delete()
+            raise Exception            
+        
 
     def put(self, request, pk=None):
         """Изменение персонажа"""
