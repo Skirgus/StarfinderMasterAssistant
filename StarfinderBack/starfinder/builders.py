@@ -49,11 +49,11 @@ class CharacterBuilder():
         character.theme = Theme.objects.get(id=theme_id)
         character.alignment = Alignment.objects.get(id=alignment_id)
         character.level = 0
-        if deity_id is not None:
+        if deity_id is not None and deity_id != 0:
             character.deity = Deity.objects.get(id=deity_id)
-        if world_id is not None:
+        if world_id is not None and world_id != 0:
             character.home_world = World.objects.get(id=world_id)
-        if subrace_id is not None:
+        if subrace_id is not None and subrace_id != 0:
             subrace = Subrace.objects.get(id=subrace_id)
             if subrace.race != character.race:
                 raise ValueError("Под раса персонажа должна принадлежать расе персонажа")
