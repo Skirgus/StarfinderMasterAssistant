@@ -41,11 +41,10 @@ class RaceSerializer(serializers.ModelSerializer):
          'min_average_height', 'max_average_height', 'age_of_majority', 'descriptions', 'playingforinformations', 'subraces', 'language')
 
 
-class CharacterRaceSerializer(serializers.ModelSerializer):    
-    subraces = SubraceSerializer(many=True, read_only=True)
+class CharacterRaceSerializer(serializers.ModelSerializer):  
     class Meta:
         model = Race
-        fields = ('id', 'name', 'subraces')
+        fields = ('id', 'name')
 
 
 class ThemeListSerializer(serializers.ModelSerializer):
@@ -155,9 +154,10 @@ class CharacterSerializer(serializers.ModelSerializer):
     theme = CharacterThemeSerilizer(many=False, read_only = False) 
     home_world = WorldSerializer(many=False, read_only=False)   
     feats = FeatListSerializer(many = True, read_only = False)
+    subrace = SubraceSerializer(many=False, read_only=False)
     class Meta:
         model = Character
-        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'alignment', 'deity', 'home_world', 'ability_pool', 'feats_pool',
+        fields = ('id','name', 'portrait', 'gender', 'description', 'race', 'theme', 'subrace', 'alignment', 'deity', 'home_world', 'ability_pool', 'feats_pool',
             'experience_to_level_up', 'experience',
             'skill_points_pool', 'level', 'basic_attack_bonus', 'basic_fortitude', 'basic_reflex', 'basic_will', 'hit_points',
             'stamina_points', 'resolve_points', 'gameclasses', 'skillvalues', 'abilityvalues', 'distributed_skill_points', 'feats')
